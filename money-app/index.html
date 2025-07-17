@@ -36,21 +36,92 @@
     <div class="container mt-4">
       <h1 class="text-center mb-4">나의 생활 관리</h1>
 
-      <div
-        class="alert alert-info alert-dismissible fade show text-center"
-        role="alert"
-        id="pwa-install-prompt"
-        style="display: none"
-      >
-        ✨ 이 앱을 **홈 화면에 추가**하고, 오프라인에서도 **앱처럼 편리하게**
-        이용해 보세요! (브라우저 메뉴에서 '홈 화면에 추가' 또는 '앱 설치' 버튼을
-        찾아보세요!)
+      <div class="text-center mb-4">
         <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="alert"
-          aria-label="Close"
-        ></button>
+          class="btn btn-info"
+          id="install-app-button"
+          style="display: none"
+        >
+          ✨ 앱 설치하기
+        </button>
+      </div>
+
+      <div
+        class="modal fade"
+        id="installGuideModal"
+        tabindex="-1"
+        aria-labelledby="installGuideModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="installGuideModalLabel">
+                앱 설치 가이드
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p class="text-center fw-bold">앱처럼 편리하게 사용해 보세요!</p>
+
+              <h6 class="fw-bold text-primary">
+                <i class="bi bi-android"></i> 안드로이드 (Chrome 브라우저)
+              </h6>
+              <ol>
+                <li>
+                  앱처럼 사용하고 싶은 페이지에서 **Chrome 브라우저 메뉴** (<i
+                    class="bi bi-three-dots-vertical"
+                  ></i>
+                  또는 <i class="bi bi-three-dots"></i>)를 탭하세요.
+                </li>
+                <li>
+                  메뉴에서 **'앱 설치'** 또는 **'홈 화면에 추가'** 옵션을 찾아서
+                  탭하세요.
+                </li>
+                <li>
+                  확인 팝업이 나타나면 **'설치'** 버튼을 탭하면 홈 화면에
+                  추가됩니다.
+                </li>
+              </ol>
+              <hr />
+              <h6 class="fw-bold text-success">
+                <i class="bi bi-apple"></i> 아이폰/아이패드 (Safari 브라우저)
+              </h6>
+              <ol>
+                <li>
+                  **Safari 브라우저**에서 앱처럼 사용하고 싶은 페이지를 엽니다.
+                  (다른 브라우저에서는 기능이 제한될 수 있습니다.)
+                </li>
+                <li>
+                  하단의 **공유 버튼** (<i class="bi bi-share-fill"></i>)을
+                  탭하세요.
+                </li>
+                <li>
+                  공유 메뉴에서 아래로 스크롤하여 **'홈 화면에 추가'** 옵션을
+                  찾아서 탭하세요.
+                </li>
+                <li>
+                  이름을 확인하고 **'추가'** 버튼을 탭하면 홈 화면에 아이콘이
+                  생성됩니다.
+                </li>
+              </ol>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="form-check form-switch mb-3 text-end">
@@ -135,6 +206,19 @@
                 />
               </div>
               <div class="mb-3">
+                <label for="expense-category" class="form-label"
+                  >카테고리</label
+                >
+                <select class="form-select" id="expense-category" required>
+                  <option value="식비">식비</option>
+                  <option value="교통비">교통비</option>
+                  <option value="문화생활">문화생활</option>
+                  <option value="생활용품">생활용품</option>
+                  <option value="월급">월급 (수입)</option>
+                  <option value="기타">기타</option>
+                </select>
+              </div>
+              <div class="mb-3">
                 <label for="expense-type" class="form-label">유형</label>
                 <select class="form-select" id="expense-type" required>
                   <option value="expense">지출</option>
@@ -145,7 +229,7 @@
             </form>
           </div>
 
-          <div class="card p-4">
+          <div class="card p-4 mb-4">
             <h3 class="mb-3">내역</h3>
             <ul class="list-group mb-3" id="expense-list"></ul>
             <div class="row text-center fw-bold">
@@ -157,6 +241,41 @@
               </div>
               <div class="col">잔액: <span id="balance">0원</span></div>
             </div>
+          </div>
+
+          <div class="card p-4 mb-4">
+            <h3 class="mb-3 text-center">지출/수입 달력</h3>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <button class="btn btn-outline-secondary" id="expense-prev-month">
+                <i class="bi bi-chevron-left"></i> 이전 달
+              </button>
+              <h4 id="expense-current-month-year" class="mb-0"></h4>
+              <button class="btn btn-outline-secondary" id="expense-next-month">
+                다음 달 <i class="bi bi-chevron-right"></i>
+              </button>
+            </div>
+            <div class="calendar-grid-header mb-2">
+              <div class="day-label">일</div>
+              <div class="day-label">월</div>
+              <div class="day-label">화</div>
+              <div class="day-label">수</div>
+              <div class="day-label">목</div>
+              <div class="day-label">금</div>
+              <div class="day-label">토</div>
+            </div>
+            <div class="calendar-grid-days" id="expense-calendar"></div>
+          </div>
+
+          <div class="card p-4">
+            <h3 class="mb-3 text-center">고급 필터 (카테고리별 통계)</h3>
+            <div
+              id="category-summary-message"
+              class="text-center text-muted mb-3"
+              style="display: none"
+            >
+              선택된 기간의 카테고리별 지출/수입 통계가 여기에 표시됩니다.
+            </div>
+            <ul class="list-group" id="expense-category-summary"></ul>
           </div>
         </div>
 
@@ -297,20 +416,16 @@
         });
       }
 
-      // PWA 설치 프롬프트 이벤트 리스너 추가 (Android/Desktop Chrome)
       let deferredPrompt;
       window.addEventListener("beforeinstallprompt", (e) => {
-        // 설치 프롬프트를 나중에 트리거할 수 있도록 이벤트 저장
         e.preventDefault();
         deferredPrompt = e;
-        // 사용자에게 PWA 설치를 제안하는 메시지를 표시
         const pwaPrompt = document.getElementById("pwa-install-prompt");
         if (pwaPrompt) {
           pwaPrompt.style.display = "block";
         }
       });
 
-      // 사용자가 PWA 설치 메시지 박스를 클릭했을 때 (옵션: alert 내부 버튼 등)
       document
         .getElementById("pwa-install-prompt")
         ?.addEventListener("click", () => {
@@ -322,32 +437,60 @@
               } else {
                 console.log("User dismissed the A2HS prompt");
               }
-              deferredPrompt = null; // 프롬프트는 한 번만 사용 가능
+              deferredPrompt = null;
               document.getElementById("pwa-install-prompt").style.display =
-                "none"; // 메시지 숨기기
+                "none";
             });
           }
         });
 
-      // 탭 변경 시 호출될 함수 (필요에 따라 각 JS 파일에 통합 또는 main.js로 이동 가능)
       document.addEventListener("DOMContentLoaded", () => {
         const myTabEl = document.querySelector("#myTab");
+
+        // 초기 로드 시 활성화된 탭의 내용 렌더링
+        const activeTabButton = myTabEl.querySelector(".nav-link.active");
+        if (activeTabButton) {
+          const activeTabId = activeTabButton.id;
+          if (activeTabId === "expense-tab") {
+            if (typeof updateExpenseCalendar === "function") {
+              updateExpenseCalendar();
+            }
+            if (typeof updateExpenseCategorySummary === "function") {
+              updateExpenseCategorySummary();
+            }
+          } else if (activeTabId === "habit-tab") {
+            if (typeof updateHabitCalendar === "function") {
+              updateHabitCalendar();
+            }
+            if (typeof updateHabitStats === "function") {
+              updateHabitStats();
+            }
+          }
+          // todo 탭은 별도의 초기화 함수가 없어도 잘 동작
+        }
+
+        // 탭 변경 시 호출될 함수
         if (myTabEl) {
           myTabEl.addEventListener("shown.bs.tab", (event) => {
-            // 차트가 있는 탭으로 이동할 때 차트 다시 그리기
-            if (
-              event.target.id === "expense-tab" &&
-              typeof updateMonthlyChart === "function"
-            ) {
-              updateMonthlyChart();
-            } else if (event.target.id === "habit-tab") {
-              if (typeof updateHabitCalendar === "function") {
-                updateHabitCalendar(); // 습관 탭으로 이동 시 달력 업데이트
+            // 가계부 탭으로 이동 시 달력 및 통계 업데이트
+            if (event.target.id === "expense-tab") {
+              if (typeof updateExpenseCalendar === "function") {
+                updateExpenseCalendar();
               }
-              if (typeof updateHabitStats === "function") {
-                updateHabitStats(); // 습관 탭으로 이동 시 통계 업데이트
+              if (typeof updateExpenseCategorySummary === "function") {
+                updateExpenseCategorySummary();
               }
             }
+            // 습관 탭으로 이동 시 달력 및 통계 업데이트
+            else if (event.target.id === "habit-tab") {
+              if (typeof updateHabitCalendar === "function") {
+                updateHabitCalendar();
+              }
+              if (typeof updateHabitStats === "function") {
+                updateHabitStats();
+              }
+            }
+            // todo 탭은 별도의 업데이트 로직 불필요
           });
         }
 
@@ -366,7 +509,6 @@
           if (darkModeSwitch.checked) {
             document.body.classList.add("dark-theme");
             localStorage.setItem("theme", "dark-theme");
-            // 다크 모드 시 Bootstrap Close 버튼 색상 조절을 위한 CSS 변수 설정
             document.documentElement.style.setProperty(
               "--dark-mode-filter",
               "1"
@@ -374,13 +516,11 @@
           } else {
             document.body.classList.remove("dark-theme");
             localStorage.setItem("theme", "light-theme");
-            // 라이트 모드 시 Bootstrap Close 버튼 색상 조절을 위한 CSS 변수 설정
             document.documentElement.style.setProperty(
               "--dark-mode-filter",
               "0"
             );
           }
-          // 테마 변경 시 차트도 업데이트 (main.js 또는 charts.js에 정의된 함수 호출)
           if (typeof updateChartsTheme === "function") {
             updateChartsTheme();
           }

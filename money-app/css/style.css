@@ -330,3 +330,95 @@ canvas {
 #no-overall-chart-data {
   color: var(--muted-text-color) !important;
 }
+/* expense calendar specific styles */
+.expense-day-cell {
+  position: relative;
+  padding: 8px 5px; /* Adjust padding for content */
+  min-height: 70px; /* Ensure enough height for content */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 0.9rem;
+  cursor: pointer; /* Indicate clickable */
+}
+
+.expense-day-cell .day-number {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}
+
+.expense-day-cell .income-amount {
+  color: var(--bs-success); /* Green for income */
+  font-size: 0.8rem;
+}
+
+.expense-day-cell .expense-amount {
+  color: var(--bs-danger); /* Red for expense */
+  font-size: 0.8rem;
+}
+
+/* Optional: Highlight selected date in calendar */
+.expense-day-cell.selected-date {
+  background-color: var(--bs-primary);
+  color: var(--bs-white);
+  border-radius: 5px;
+}
+
+/* Category summary styles */
+.expense-category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--bs-border-color); /* Use Bootstrap variable for consistency */
+}
+
+.expense-category-item:last-child {
+  border-bottom: none;
+}
+
+.expense-category-item .category-name {
+  font-weight: bold;
+}
+
+.expense-category-item .category-amount {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+/* Dark mode specific adjustments for category items */
+body.dark-theme .expense-category-item {
+  border-color: #444; /* Darker border for dark mode */
+}
+/* style.css 파일에 다음을 추가 (선택 사항: 이미 있으면 넘어가도 됨) */
+body.dark-theme .modal-content {
+  background-color: var(--bs-body-bg); /* 다크 모드 배경색과 일치 */
+  color: var(--bs-body-color); /* 다크 모드 텍스트 색상과 일치 */
+}
+
+body.dark-theme .modal-header,
+body.dark-theme .modal-footer {
+  border-color: var(--bs-border-color-translucent); /* 테두리 색상 조정 */
+}
+
+/* 설치 버튼 다크모드 대비 */
+body.dark-theme #install-app-button {
+  background-color: var(--bs-info); /* 부트스트랩 info 색상 사용 */
+  color: var(--bs-white); /* 텍스트는 흰색으로 */
+  border-color: var(--bs-info);
+}
+
+body.dark-theme #install-app-button:hover {
+  background-color: #0d6efd; /* hover 시 약간 더 진한 색상 */
+  border-color: #0d6efd;
+}
+
+/* 모달 내부 아이콘 색상 (선택 사항: 필요한 경우) */
+.bi-android {
+  color: var(--bs-primary);
+}
+.bi-apple {
+  color: var(--bs-success); /* iOS는 일반적으로 녹색이나 파란색 계열로 표시 */
+}
