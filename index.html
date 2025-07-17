@@ -13,8 +13,21 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="container mt-5">
+    <div class="container mt-5" id="mainApp">
       <h1 class="text-center mb-4">나의 독서 목록 & 감상평</h1>
+
+      <div class="row mb-3 align-items-center">
+        <div class="col-md-4 offset-md-8 text-end">
+          <label for="themeSelector" class="form-label mb-0 me-2"
+            >테마 선택:</label
+          >
+          <select
+            class="form-select d-inline-block w-auto"
+            id="themeSelector"
+            onchange="applyTheme(this.value)"
+          ></select>
+        </div>
+      </div>
 
       <div class="card p-4 mb-4 shadow-sm">
         <h2 class="card-title text-primary mb-3">새 책 추가</h2>

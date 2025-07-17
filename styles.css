@@ -1,34 +1,144 @@
 /* styles.css */
 
+/* --- CSS 변수 정의 (기본값 설정) --- */
+:root {
+  --primary-color: #0d6efd; /* Bootstrap primary */
+  --secondary-color: #6c757d; /* Bootstrap secondary */
+  --success-color: #198754; /* Bootstrap success */
+  --info-color: #0dcaf0; /* Bootstrap info */
+  --danger-color: #dc3545; /* Bootstrap danger */
+  --warning-color: #ffc107; /* Bootstrap warning */
+
+  --background-color: #f8f9fa; /* Light background */
+  --card-background-color: #ffffff; /* White card background */
+  --text-color: #212529; /* Dark text */
+  --muted-text-color: #6c757d; /* Muted text */
+  --border-color: #dee2e6; /* Light border */
+}
+
 body {
-  background-color: #f8f9fa;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.card {
+  background-color: var(--card-background-color);
+  border-color: var(--border-color);
 }
 
 .card-title {
   font-weight: bold;
+  color: var(
+    --primary-color
+  ) !important; /* Bootstrap 클래스보다 우선하도록 !important 사용 */
 }
 
-.book-item-content {
-  flex-grow: 1;
-  margin-right: 15px;
+.form-label,
+strong {
+  color: var(--text-color);
 }
 
-.book-item-actions .btn {
-  min-width: 80px;
+.text-primary {
+  color: var(--primary-color) !important;
+}
+.text-success {
+  color: var(--success-color) !important;
+}
+.text-info {
+  color: var(--info-color) !important;
+}
+.text-danger {
+  color: var(--danger-color) !important;
+}
+.text-muted {
+  color: var(--muted-text-color) !important;
 }
 
-/* 필터 버튼들을 위한 스타일 (장르, 완결작, 연재작 공통) */
-#filterButtons .btn {
-  white-space: nowrap;
-  font-size: 0.85rem;
-  padding: 0.25rem 0.5rem;
+/* 버튼 색상 */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+.btn-primary:hover {
+  background-color: var(
+    --primary-color
+  ); /* 호버 시 약간 어둡게 또는 Lighten/Darken 함수 사용 가능 */
+  border-color: var(--primary-color);
+  filter: brightness(85%); /* 임시적으로 약간 어둡게 */
+}
+.btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  color: var(--card-background-color);
 }
 
-#results ul {
-  list-style: disc;
-  padding-left: 20px;
+.btn-success {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+}
+.btn-success:hover {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+  filter: brightness(85%);
+}
+.btn-outline-success {
+  color: var(--success-color);
+  border-color: var(--success-color);
+}
+.btn-outline-success:hover {
+  background-color: var(--success-color);
+  color: var(--card-background-color);
 }
 
-#results li {
-  margin-bottom: 5px;
+.btn-outline-info {
+  color: var(--info-color);
+  border-color: var(--info-color);
+}
+.btn-outline-info:hover,
+.btn-outline-info.active {
+  /* active 상태도 변경 */
+  background-color: var(--info-color);
+  color: var(--card-background-color);
+}
+
+.btn-outline-secondary {
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+.btn-outline-secondary:hover,
+.btn-outline-secondary.active {
+  background-color: var(--secondary-color);
+  color: var(--card-background-color);
+}
+
+.btn-outline-danger {
+  color: var(--danger-color);
+  border-color: var(--danger-color);
+}
+.btn-outline-danger:hover {
+  background-color: var(--danger-color);
+  color: var(--card-background-color);
+}
+
+/* 폼 컨트롤 배경 및 테두리 */
+.form-control,
+.form-select {
+  background-color: var(--card-background-color);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+.form-control::placeholder {
+  color: var(--muted-text-color);
+}
+
+/* 기타 */
+.list-group-item {
+  background-color: var(--card-background-color);
+  border-color: var(--border-color);
+}
+.list-group-item.list-group-item-action:hover {
+  background-color: var(--background-color); /* 호버 시 배경색으로 변경 */
 }
