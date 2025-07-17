@@ -74,17 +74,17 @@
               </h6>
               <ol>
                 <li>
-                  앱처럼 사용하고 싶은 페이지에서 **Chrome 브라우저 메뉴** (<i
+                  앱처럼 사용하고 싶은 페이지에서 Chrome 브라우저 메뉴 (<i
                     class="bi bi-three-dots-vertical"
                   ></i>
                   또는 <i class="bi bi-three-dots"></i>)를 탭하세요.
                 </li>
                 <li>
-                  메뉴에서 **'앱 설치'** 또는 **'홈 화면에 추가'** 옵션을 찾아서
+                  메뉴에서 '앱 설치' 또는 '홈 화면에 추가' 옵션을 찾아서
                   탭하세요.
                 </li>
                 <li>
-                  확인 팝업이 나타나면 **'설치'** 버튼을 탭하면 홈 화면에
+                  확인 팝업이 나타나면 '설치' 버튼을 탭하면 홈 화면에
                   추가됩니다.
                 </li>
               </ol>
@@ -94,19 +94,19 @@
               </h6>
               <ol>
                 <li>
-                  **Safari 브라우저**에서 앱처럼 사용하고 싶은 페이지를 엽니다.
+                  Safari 브라우저에서 앱처럼 사용하고 싶은 페이지를 엽니다.
                   (다른 브라우저에서는 기능이 제한될 수 있습니다.)
                 </li>
                 <li>
-                  하단의 **공유 버튼** (<i class="bi bi-share-fill"></i>)을
+                  하단의 공유 버튼 (<i class="bi bi-share-fill"></i>)을
                   탭하세요.
                 </li>
                 <li>
-                  공유 메뉴에서 아래로 스크롤하여 **'홈 화면에 추가'** 옵션을
-                  찾아서 탭하세요.
+                  공유 메뉴에서 아래로 스크롤하여 '홈 화면에 추가' 옵션을 찾아서
+                  탭하세요.
                 </li>
                 <li>
-                  이름을 확인하고 **'추가'** 버튼을 탭하면 홈 화면에 아이콘이
+                  이름을 확인하고 '추가' 버튼을 탭하면 홈 화면에 아이콘이
                   생성됩니다.
                 </li>
               </ol>
@@ -392,147 +392,10 @@
       crossorigin="anonymous"
     ></script>
 
+    <script src="js/main.js"></script>
     <script src="js/expense.js"></script>
     <script src="js/todo.js"></script>
     <script src="js/habit.js"></script>
     <script src="js/charts.js"></script>
-
-    <script src="js/main.js"></script>
-
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/service-worker.js")
-            .then((registration) => {
-              console.log(
-                "Service Worker registered with scope:",
-                registration.scope
-              );
-            })
-            .catch((error) => {
-              console.log("Service Worker registration failed:", error);
-            });
-        });
-      }
-
-      let deferredPrompt;
-      window.addEventListener("beforeinstallprompt", (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        const pwaPrompt = document.getElementById("pwa-install-prompt");
-        if (pwaPrompt) {
-          pwaPrompt.style.display = "block";
-        }
-      });
-
-      document
-        .getElementById("pwa-install-prompt")
-        ?.addEventListener("click", () => {
-          if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-              if (choiceResult.outcome === "accepted") {
-                console.log("User accepted the A2HS prompt");
-              } else {
-                console.log("User dismissed the A2HS prompt");
-              }
-              deferredPrompt = null;
-              document.getElementById("pwa-install-prompt").style.display =
-                "none";
-            });
-          }
-        });
-
-      document.addEventListener("DOMContentLoaded", () => {
-        const myTabEl = document.querySelector("#myTab");
-
-        // 초기 로드 시 활성화된 탭의 내용 렌더링
-        const activeTabButton = myTabEl.querySelector(".nav-link.active");
-        if (activeTabButton) {
-          const activeTabId = activeTabButton.id;
-          if (activeTabId === "expense-tab") {
-            if (typeof updateExpenseCalendar === "function") {
-              updateExpenseCalendar();
-            }
-            if (typeof updateExpenseCategorySummary === "function") {
-              updateExpenseCategorySummary();
-            }
-          } else if (activeTabId === "habit-tab") {
-            if (typeof updateHabitCalendar === "function") {
-              updateHabitCalendar();
-            }
-            if (typeof updateHabitStats === "function") {
-              updateHabitStats();
-            }
-          }
-          // todo 탭은 별도의 초기화 함수가 없어도 잘 동작
-        }
-
-        // 탭 변경 시 호출될 함수
-        if (myTabEl) {
-          myTabEl.addEventListener("shown.bs.tab", (event) => {
-            // 가계부 탭으로 이동 시 달력 및 통계 업데이트
-            if (event.target.id === "expense-tab") {
-              if (typeof updateExpenseCalendar === "function") {
-                updateExpenseCalendar();
-              }
-              if (typeof updateExpenseCategorySummary === "function") {
-                updateExpenseCategorySummary();
-              }
-            }
-            // 습관 탭으로 이동 시 달력 및 통계 업데이트
-            else if (event.target.id === "habit-tab") {
-              if (typeof updateHabitCalendar === "function") {
-                updateHabitCalendar();
-              }
-              if (typeof updateHabitStats === "function") {
-                updateHabitStats();
-              }
-            }
-            // todo 탭은 별도의 업데이트 로직 불필요
-          });
-        }
-
-        // 다크 모드 스위치 이벤트 리스너
-        const darkModeSwitch = document.getElementById("darkModeSwitch");
-        const currentTheme = localStorage.getItem("theme");
-
-        if (currentTheme) {
-          document.body.classList.add(currentTheme);
-          if (currentTheme === "dark-theme") {
-            darkModeSwitch.checked = true;
-          }
-        }
-
-        darkModeSwitch.addEventListener("change", () => {
-          if (darkModeSwitch.checked) {
-            document.body.classList.add("dark-theme");
-            localStorage.setItem("theme", "dark-theme");
-            document.documentElement.style.setProperty(
-              "--dark-mode-filter",
-              "1"
-            );
-          } else {
-            document.body.classList.remove("dark-theme");
-            localStorage.setItem("theme", "light-theme");
-            document.documentElement.style.setProperty(
-              "--dark-mode-filter",
-              "0"
-            );
-          }
-          if (typeof updateChartsTheme === "function") {
-            updateChartsTheme();
-          }
-        });
-
-        // 초기 로드 시 다크 모드 스위치에 따라 Close 버튼 필터 설정
-        if (document.body.classList.contains("dark-theme")) {
-          document.documentElement.style.setProperty("--dark-mode-filter", "1");
-        } else {
-          document.documentElement.style.setProperty("--dark-mode-filter", "0");
-        }
-      });
-    </script>
   </body>
 </html>
