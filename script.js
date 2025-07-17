@@ -23,6 +23,23 @@ const THEMES = {
       "--border-color": "#dee2e6",
     },
   },
+  "spring-blossom": {
+    // 새로운 '따뜻한 봄날' 테마 추가
+    name: "따뜻한 봄날",
+    colors: {
+      "--primary-color": "#A7D9B4", // 부드러운 민트 그린
+      "--secondary-color": "#F8E8A6", // 은은한 개나리 노랑
+      "--success-color": "#8BBF9D", // 약간 더 진한 그린
+      "--info-color": "#CDE7B4", // 밝은 연두색
+      "--danger-color": "#FFB6C1", // 사랑스러운 연분홍
+      "--warning-color": "#FFDDC1", // 살구색
+      "--background-color": "#FDF9F3", // 거의 흰색에 가까운 크림 아이보리 배경
+      "--card-background-color": "#FFFFFF", // 깨끗한 흰색 카드 배경
+      "--text-color": "#5C6D7D", // 차분한 청회색 텍스트
+      "--muted-text-color": "#8797A7", // 뮤트 청회색 텍스트
+      "--border-color": "#E0E7E9", // 아주 연한 회색 테두리
+    },
+  },
   "summer-breeze": {
     name: "여름 바람 (Color Hunt)",
     colors: {
@@ -40,7 +57,7 @@ const THEMES = {
     },
   },
   "soft-beige": {
-    name: "부드러운 베이지",
+    name: "부드러운 겨울",
     colors: {
       "--primary-color": "#A89078", // 은은한 베이지 톤
       "--secondary-color": "#D3BCA0", // 좀 더 밝은 베이지
@@ -56,19 +73,19 @@ const THEMES = {
     },
   },
   "cozy-autumn": {
-    name: "아늑한 가을 (Color Hunt)",
+    name: "활기찬 가을 (Color Hunt)",
     colors: {
-      "--primary-color": "#DF7857",
-      "--secondary-color": "#6C757D",
-      "--success-color": "#8A307F",
-      "--info-color": "#FFB084",
-      "--danger-color": "#D62246",
-      "--warning-color": "#F2A154",
-      "--background-color": "#FEFBF3",
-      "--card-background-color": "#F6F0E0",
-      "--text-color": "#4A4A4A",
-      "--muted-text-color": "#888888",
-      "--border-color": "#D9D3C8",
+      "--primary-color": "#77BEF0", // 밝은 파랑 (주요 색상)
+      "--secondary-color": "#FFCB61", // 밝은 노랑 (보조 색상)
+      "--success-color": "#609966", // 기존 성공 색상 유지 또는 #77BEF0 밝게
+      "--info-color": "#EA5B6F", // 붉은 계열 (정보 강조)
+      "--danger-color": "#FF894F", // 주황색 (위험 강조)
+      "--warning-color": "#F1E3D1", // 기존 경고 색상 유사 밝은 톤 유지
+      "--background-color": "#F8F9FA", // 밝은 배경 유지
+      "--card-background-color": "#FFFFFF", // 흰색 카드 배경 유지
+      "--text-color": "#212529", // 어두운 텍스트 유지
+      "--muted-text-color": "#6c757d", // 뮤트 텍스트 유지
+      "--border-color": "#dee2e6", // 밝은 테두리 유지
     },
   },
 };
