@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>나의 통합 관리 앱 - 가계부, 할 일, 습관</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="light-theme">
+    <div class="container mt-5">
+      <h1 class="text-center mb-4">나의 통합 관리 앱</h1>
+
+      <div class="d-flex justify-content-end mb-3">
+        <button id="theme-toggle-btn" class="btn btn-outline-secondary">
+          <i class="bi bi-moon-fill me-2"></i>나이트 모드
+        </button>
+      </div>
+
+      <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="expense-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#expense"
+            type="button"
+            role="tab"
+            aria-controls="expense"
+            aria-selected="true"
+          >
+            가계부
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="todo-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#todo"
+            type="button"
+            role="tab"
+            aria-controls="todo"
+            aria-selected="false"
+          >
+            할 일
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="habit-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#habit"
+            type="button"
+            role="tab"
+            aria-controls="habit"
+            aria-selected="false"
+          >
+            습관
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="myTabContent">
+        <div
+          class="tab-pane fade show active"
+          id="expense"
+          role="tabpanel"
+          aria-labelledby="expense-tab"
+        >
+          <div class="card p-4 shadow-sm">
+            <h2 class="mb-3">가계부</h2>
+            <form id="expense-form">
+              <div class="mb-3">
+                <label for="date" class="form-label">날짜</label>
+                <input type="date" class="form-control" id="date" required />
+              </div>
+              <div class="mb-3">
+                <label for="item" class="form-label">항목</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="item"
+                  placeholder="예: 점심 식사, 월급"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="amount" class="form-label">금액</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="amount"
+                  placeholder="금액 입력"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="type" class="form-label">유형</label>
+                <select class="form-select" id="type">
+                  <option value="expense">지출</option>
+                  <option value="income">수입</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="memo" class="form-label">메모 (선택 사항)</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="memo"
+                  placeholder="메모 입력"
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">기록 추가</button>
+            </form>
+
+            <hr class="my-4" />
+
+            <h3>내역</h3>
+            <div class="d-flex justify-content-between mb-3">
+              <div>
+                총 수입:
+                <span id="total-income" class="fw-bold text-success">0원</span>
+              </div>
+              <div>
+                총 지출:
+                <span id="total-expense" class="fw-bold text-danger">0원</span>
+              </div>
+              <div>잔액: <span id="balance" class="fw-bold">0원</span></div>
+            </div>
+
+            <ul id="expense-list" class="list-group"></ul>
+          </div>
+        </div>
+
+        <div
+          class="tab-pane fade"
+          id="todo"
+          role="tabpanel"
+          aria-labelledby="todo-tab"
+        >
+          <div class="card p-4 shadow-sm">
+            <h2 class="mb-3">할 일 목록</h2>
+            <form id="todo-form" class="mb-4">
+              <div class="mb-3">
+                <label for="todo-text" class="form-label">할 일</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="todo-text"
+                  placeholder="예: 보고서 작성, 장보기"
+                  required
+                />
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="todo-due-date" class="form-label"
+                    >마감일 (선택)</label
+                  >
+                  <input type="date" class="form-control" id="todo-due-date" />
+                </div>
+                <div class="col-md-6">
+                  <label for="todo-priority" class="form-label">우선순위</label>
+                  <select class="form-select" id="todo-priority">
+                    <option value="low">낮음</option>
+                    <option value="medium" selected>중간</option>
+                    <option value="high">높음</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">할 일 추가</button>
+            </form>
+
+            <h4>내 할 일</h4>
+            <ul id="todo-list" class="list-group"></ul>
+          </div>
+        </div>
+
+        <div
+          class="tab-pane fade"
+          id="habit"
+          role="tabpanel"
+          aria-labelledby="habit-tab"
+        >
+          <div class="card p-4 shadow-sm">
+            <h2 class="mb-3">습관 추적기</h2>
+            <form id="habit-form" class="mb-4">
+              <div class="mb-3">
+                <label for="habit-name" class="form-label">새 습관 이름</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="habit-name"
+                  placeholder="예: 매일 운동하기, 아침 독서 30분"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">습관 추가</button>
+            </form>
+
+            <hr class="my-4" />
+
+            <h4 class="mb-3">등록된 습관들</h4>
+            <ul id="active-habit-list" class="list-group mb-4"></ul>
+
+            <hr class="my-4" />
+
+            <h4 class="mb-3">습관 달력</h4>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <button class="btn btn-outline-secondary" id="prev-month-btn">
+                &lt; 이전 달
+              </button>
+              <h4 id="current-month-year" class="mb-0"></h4>
+              <button class="btn btn-outline-secondary" id="next-month-btn">
+                다음 달 &gt;
+              </button>
+            </div>
+            <div class="calendar-grid-header">
+              <div class="day-label">일</div>
+              <div class="day-label">월</div>
+              <div class="day-label">화</div>
+              <div class="day-label">수</div>
+              <div class="day-label">목</div>
+              <div class="day-label">금</div>
+              <div class="day-label">토</div>
+            </div>
+            <div id="calendar-days-grid" class="calendar-grid-days mb-4"></div>
+
+            <hr class="my-4" />
+            <h4 class="mb-3">습관 통계</h4>
+            <div id="habit-stats" class="row mb-4">
+              <p class="text-muted text-center" id="no-habit-stats-message">
+                등록된 습관이 없습니다.
+              </p>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <div class="card p-3 h-100">
+                  <h5 class="mb-3">월별 습관 실천 횟수</h5>
+                  <canvas id="monthlyPracticeChart"></canvas>
+                  <p
+                    class="text-muted text-center mt-2"
+                    id="no-monthly-chart-data"
+                  >
+                    데이터가 부족합니다.
+                  </p>
+                </div>
+              </div>
+              <div class="col-md-6 mb-4">
+                <div class="card p-3 h-100">
+                  <h5 class="mb-3">전체 습관 실천 비율 (상위 5개)</h5>
+                  <canvas id="overallPracticeChart"></canvas>
+                  <p
+                    class="text-muted text-center mt-2"
+                    id="no-overall-chart-data"
+                  >
+                    데이터가 부족합니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="habitDetailModal"
+      tabindex="-1"
+      aria-labelledby="habitDetailModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="habitDetailModalLabel"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="habitDetailModalBody"></div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+
+    <script src="js/expense.js"></script>
+    <script src="js/todo.js"></script>
+    <script src="js/habit.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>

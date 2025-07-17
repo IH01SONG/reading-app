@@ -1,0 +1,264 @@
+/* css/style.css */
+
+/* 기본 라이트 테마 변수 */
+:root {
+  --primary-color: #6c5ce7; /* 보라색 계열 */
+  --primary-color-rgb: 108, 92, 231;
+  --secondary-color: #a29bfe; /* 밝은 보라색 */
+  --success-color: #00b894; /* 초록색 */
+  --danger-color: #d63031; /* 빨간색 */
+  --warning-color: #fdcb6e; /* 노란색 */
+  --info-color: #0984e3; /* 파란색 */
+
+  --background-color: #f8f9fa; /* 전체 배경 */
+  --card-background-color: #ffffff; /* 카드 배경 */
+  --text-color: #2d3436; /* 기본 텍스트 색상 */
+  --muted-text-color: #636e72; /* 회색 텍스트 */
+  --border-color: #dee2e6; /* 경계선 색상 */
+  --input-bg-color: #ffffff; /* 입력 필드 배경 */
+  --input-text-color: #2d3436; /* 입력 필드 텍스트 */
+  --modal-bg-color: #ffffff; /* 모달 배경 */
+  --modal-text-color: #2d3436; /* 모달 텍스트 */
+  --nav-link-color: #495057; /* 탭 버튼 텍스트 */
+  --nav-link-active-bg: #e9ecef; /* 활성 탭 배경 */
+  --nav-link-active-border-color: #dee2e6 #dee2e6 #ffffff; /* 활성 탭 테두리 */
+}
+
+/* 다크 테마 변수 (body에 .dark-theme 클래스가 있을 때 적용) */
+body.dark-theme {
+  --primary-color: #00ff00; /* 네온 그린 */
+  --primary-color-rgb: 0, 255, 0;
+  --secondary-color: #39ff14; /* 약간 다른 네온 그린 */
+  --success-color: #00b894; /* 기존 유지 (밝은 녹색은 너무 밝을 수 있음) */
+  --danger-color: #ff6b6b; /* 어둠에 어울리는 빨강 */
+  --warning-color: #ffe66d; /* 어둠에 어울리는 노랑 */
+  --info-color: #4ecdc4; /* 어둠에 어울리는 파랑 */
+
+  --background-color: #121212; /* 어두운 배경 */
+  --card-background-color: #1e1e1e; /* 어두운 카드 배경 */
+  --text-color: #e0e0e0; /* 밝은 텍스트 */
+  --muted-text-color: #a0a0a0; /* 밝은 회색 텍스트 */
+  --border-color: #333333; /* 어두운 경계선 */
+  --input-bg-color: #2d2d2d; /* 입력 필드 배경 */
+  --input-text-color: #e0e0e0; /* 입력 필드 텍스트 */
+  --modal-bg-color: #1e1e1e; /* 모달 배경 */
+  --modal-text-color: #e0e0e0; /* 모달 텍스트 */
+  --nav-link-color: #a0a0a0; /* 탭 버튼 텍스트 */
+  --nav-link-active-bg: #2d2d2d; /* 활성 탭 배경 */
+  --nav-link-active-border-color: #333333 #333333 #1e1e1e; /* 활성 탭 테두리 */
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease; /* 부드러운 전환 효과 */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-color); /* 제목 색상도 테마에 따라 변경 */
+}
+
+.container {
+  max-width: 800px;
+}
+
+.card {
+  background-color: var(--card-background-color);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Bootstrap 클래스 오버라이드 (변수 사용) */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--background-color); /* 버튼 텍스트 색상도 배경색에 따라 */
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    color 0.3s ease;
+}
+.btn-primary:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  opacity: 0.9;
+}
+.btn-outline-secondary {
+  border-color: var(--border-color);
+  color: var(--text-color);
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+.btn-outline-secondary:hover {
+  background-color: var(--primary-color); /* 호버 시 네온 그린 */
+  border-color: var(--primary-color);
+  color: var(--background-color); /* 텍스트는 어두운 배경색 */
+}
+
+/* 탭 메뉴 색상 */
+.nav-tabs {
+  border-bottom-color: var(--border-color);
+}
+.nav-tabs .nav-link {
+  color: var(--nav-link-color);
+  border-color: transparent;
+  transition: color 0.3s ease, background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+.nav-tabs .nav-link:hover {
+  border-color: var(--border-color) var(--border-color) var(--border-color);
+}
+.nav-tabs .nav-link.active {
+  color: var(--primary-color); /* 활성 탭 텍스트는 네온 그린 */
+  background-color: var(--card-background-color);
+  border-color: var(--border-color) var(--border-color)
+    var(--card-background-color);
+}
+
+/* 입력 필드 */
+.form-control,
+.form-select {
+  background-color: var(--input-bg-color);
+  color: var(--input-text-color);
+  border-color: var(--border-color);
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
+}
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--input-bg-color);
+  color: var(--input-text-color);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
+}
+.form-label {
+  color: var(--text-color);
+}
+
+/* 가계부 항목 스타일 */
+.list-group-item {
+  background-color: var(--card-background-color);
+  border-color: var(--border-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    color 0.3s ease;
+}
+.list-group-item .amount.expense {
+  color: var(--danger-color);
+}
+.list-group-item .amount.income {
+  color: var(--success-color);
+}
+#total-income {
+  color: var(--success-color) !important;
+}
+#total-expense {
+  color: var(--danger-color) !important;
+}
+#balance {
+  color: var(--text-color) !important;
+} /* 잔액 색상도 테마 따라 변경 */
+
+/* To-Do 리스트 우선순위 뱃지 색상 */
+.badge.bg-danger {
+  background-color: var(--danger-color) !important;
+}
+.badge.bg-warning {
+  background-color: var(--warning-color) !important;
+}
+.badge.bg-info {
+  background-color: var(--info-color) !important;
+}
+.badge.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
+.list-group-item.list-group-item-secondary {
+  background-color: var(--border-color) !important;
+  color: var(--muted-text-color) !important;
+} /* 완료된 To-Do */
+.list-group-item.list-group-item-danger {
+  background-color: rgba(var(--danger-color-rgb), 0.2) !important;
+}
+.list-group-item.list-group-item-warning {
+  background-color: rgba(var(--warning-color-rgb), 0.2) !important;
+}
+
+/* 습관 추적기 달력 스타일 */
+.day-label {
+  color: var(--primary-color);
+} /* 요일 글자색 네온 그린 */
+.calendar-day {
+  background-color: var(--input-bg-color); /* 입력 필드와 동일하게 */
+  border-color: var(--border-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    color 0.3s ease;
+}
+.calendar-day:hover {
+  background-color: var(--secondary-color); /* 호버 시 밝은 보라/네온 그린 */
+  color: var(--background-color); /* 텍스트는 배경색 */
+}
+
+.calendar-day.empty {
+  background-color: transparent;
+  border: none;
+  cursor: default;
+}
+
+.calendar-day.completed {
+  background-color: var(--primary-color); /* 완료된 날짜는 네온 그린 */
+  color: var(--background-color); /* 텍스트는 어두운 배경색 */
+  font-weight: bold;
+  border-color: var(--primary-color);
+}
+
+.calendar-day.completed:hover {
+  background-color: var(--primary-color);
+  filter: brightness(1.2); /* 약간 더 밝게 */
+}
+
+.calendar-day.today {
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 0 8px rgba(var(--primary-color-rgb), 0.7); /* 더 선명한 그림자 */
+}
+
+.habit-indicators i.text-success {
+  color: var(--primary-color) !important;
+} /* 달력 체크 아이콘도 네온 그린 */
+
+/* 통계 카드 스타일 (기존 카드 스타일 따름) */
+#habit-stats .card {
+  background-color: var(--card-background-color);
+  border-color: var(--border-color);
+}
+
+/* 모달 스타일 */
+.modal-content {
+  background-color: var(--modal-bg-color);
+  color: var(--modal-text-color);
+  border-color: var(--border-color);
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
+}
+.modal-header {
+  border-bottom-color: var(--border-color);
+}
+.modal-footer {
+  border-top-color: var(--border-color);
+}
+.btn-close {
+  filter: invert(var(--dark-mode-filter, 0)); /* 테마에 따라 X 버튼 색상 반전 */
+  transition: filter 0.3s ease;
+}
+
+/* 차트 색상 (Chart.js는 JS에서 직접 색상 설정하므로, 여기서는 차트 배경 정도만) */
+canvas {
+  background-color: var(--input-bg-color); /* 차트 배경색 */
+  border-radius: 5px;
+}
