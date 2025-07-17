@@ -56,6 +56,22 @@ const THEMES = {
       "--border-color": "#5C677D",
     },
   },
+  "cozy-autumn": {
+    name: "활기찬 가을 (Color Hunt)",
+    colors: {
+      "--primary-color": "#0a4804ff", // 밝은 파랑 (주요 색상)
+      "--secondary-color": "#ecc679ff", // 밝은 노랑 (보조 색상)
+      "--success-color": "#58985eff", // 기존 성공 색상 유지 또는 #aff077ff 밝게
+      "--info-color": "#EA5B6F", // 붉은 계열 (정보 강조)
+      "--danger-color": "#FF894F", // 주황색 (위험 강조)
+      "--warning-color": "#c39961ff", // 기존 경고 색상 유사 밝은 톤 유지
+      "--background-color": "#3c5740ff", // 밝은 배경 유지
+      "--card-background-color": "#f5dbbdff", // 흰색 카드 배경 유지
+      "--text-color": "#212529", // 어두운 텍스트 유지
+      "--muted-text-color": "#404a52ff", // 뮤트 텍스트 유지
+      "--border-color": "#0c3912ff", // 밝은 테두리 유지
+    },
+  },
   "soft-beige": {
     name: "부드러운 겨울",
     colors: {
@@ -72,27 +88,13 @@ const THEMES = {
       "--border-color": "#D6CABA", // 부드러운 베이지 테두리
     },
   },
-  "cozy-autumn": {
-    name: "활기찬 가을 (Color Hunt)",
-    colors: {
-      "--primary-color": "#77BEF0", // 밝은 파랑 (주요 색상)
-      "--secondary-color": "#FFCB61", // 밝은 노랑 (보조 색상)
-      "--success-color": "#609966", // 기존 성공 색상 유지 또는 #77BEF0 밝게
-      "--info-color": "#EA5B6F", // 붉은 계열 (정보 강조)
-      "--danger-color": "#FF894F", // 주황색 (위험 강조)
-      "--warning-color": "#F1E3D1", // 기존 경고 색상 유사 밝은 톤 유지
-      "--background-color": "#F8F9FA", // 밝은 배경 유지
-      "--card-background-color": "#FFFFFF", // 흰색 카드 배경 유지
-      "--text-color": "#212529", // 어두운 텍스트 유지
-      "--muted-text-color": "#6c757d", // 뮤트 텍스트 유지
-      "--border-color": "#dee2e6", // 밝은 테두리 유지
-    },
-  },
 };
 
 // --- 테마 관련 DOM 요소 ---
 const mainApp = document.getElementById("mainApp");
 const themeSelector = document.getElementById("themeSelector"); // 테마 선택 드롭다운
+const genreRankingList = document.getElementById("genreRankingList"); // 새로운 DOM 요소
+const noRankingMessage = document.getElementById("noRankingMessage"); // 새로운 DOM 요소
 
 // 앱 로드 시 실행
 document.addEventListener("DOMContentLoaded", () => {
@@ -121,6 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
   applyFilter();
   generateStats();
   updateFilterButtons();
+  generateGenreRanking(); // **새로 추가: 장르별 별점 순위 생성**
 });
 
 // 테마 적용 함수
@@ -141,10 +144,66 @@ function applyTheme(themeKey) {
   localStorage.setItem("selectedTheme", themeKey);
 }
 
+// --- 장르별 별점 순위 생성 함수 ---
+function generateGenreRanking() {
+  // 별점 정보가 있는 책들만 필터링 (0점은 제외)
+  const ratedBooks = books.filter((book) => book.rating > 0);
+
+  // 장르별 별점 합계 및 개수 계산
+  const genreStats = ratedBooks.reduce((acc, book) => {
+    const genre = book.genre || "미지정";
+    if (!acc[genre]) {
+      acc[genre] = { totalRating: 0, count: 0 };
+    }
+    acc[genre].totalRating += book.rating;
+    acc[genre].count++;
+    return acc;
+  }, {});
+
+  // 장르별 평균 별점 계산 및 배열로 변환
+  const genreAverages = Object.keys(genreStats).map((genre) => {
+    const stats = genreStats[genre];
+    return {
+      genre: genre,
+      averageRating: (stats.totalRating / stats.count).toFixed(2), // 소수점 두 자리까지
+      bookCount: stats.count,
+    };
+  });
+
+  // 평균 별점 기준으로 내림차순 정렬 (높은 별점이 먼저 오도록)
+  genreAverages.sort((a, b) => b.averageRating - a.averageRating);
+
+  genreRankingList.innerHTML = ""; // 기존 목록 초기화
+
+  if (genreAverages.length === 0) {
+    noRankingMessage.style.display = "block"; // 메시지 표시
+  } else {
+    noRankingMessage.style.display = "none"; // 메시지 숨김
+    genreAverages.forEach((item, index) => {
+      const listItem = document.createElement("div");
+      listItem.className =
+        "list-group-item d-flex justify-content-between align-items-center mb-1";
+      listItem.innerHTML = `
+                <div>
+                    <strong class="text-primary">${index + 1}. ${
+        item.genre
+      }</strong>
+                    <small class="text-muted ms-2">(${item.bookCount}권)</small>
+                </div>
+                <span class="badge bg-secondary rounded-pill">${"⭐".repeat(
+                  Math.round(item.averageRating)
+                )} (${item.averageRating})</span>
+            `;
+      genreRankingList.appendChild(listItem);
+    });
+  }
+}
+
 // --- 기존 독서 목록 앱 로직 (변화 없음) ---
 
 function saveBooks() {
   localStorage.setItem("myReadingList", JSON.stringify(books));
+  generateGenreRanking(); // **추가: 데이터 변경 시 순위 업데이트**
 }
 
 function loadBooks() {
