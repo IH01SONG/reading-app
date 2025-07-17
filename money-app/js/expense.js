@@ -76,7 +76,9 @@ function updateAllExpenseViews() {
   updateSummary();
   renderExpenseList(selectedCalendarDate); // 선택된 날짜에 따라 내역 표시
   updateExpenseCalendar();
-  updateExpenseCategorySummary(selectedCalendarDate); // 선택된 날짜에 따라 카테고리 요약 표시
+  updateExpenseCategorySummary(selectedCalendarDate);
+  // 선택된 날짜에 따라 카테고리 요약 표시
+  renderExpenseCharts(expenses, selectedCalendarDate);
 }
 
 // =========================================================================
