@@ -6,15 +6,15 @@
     <title>나의 생활 관리 앱</title>
 
     <link rel="manifest" href="manifest.json" />
-    <meta name="mobile-web-app-capable" content="yes" />
+
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    ```
     <meta
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
     />
     <meta name="apple-mobile-web-app-title" content="생활관리" />
     <link rel="apple-touch-icon" href="/images/icons/icon-192x192.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
 
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -32,17 +32,33 @@
 
     <link rel="stylesheet" href="css/style.css" />
   </head>
-  <body class="light-theme">
-    <div class="container mt-5">
-      <h1 class="text-center mb-4">나의 통합 관리 앱</h1>
+  <body>
+    <div class="container mt-4">
+      <h1 class="text-center mb-4">나의 생활 관리</h1>
 
-      <div class="d-flex justify-content-end mb-3">
-        <button id="theme-toggle-btn" class="btn btn-outline-secondary">
-          <i class="bi bi-moon-fill me-2"></i>나이트 모드
-        </button>
+      <div
+        class="alert alert-info alert-dismissible fade show text-center"
+        role="alert"
+        id="pwa-install-prompt"
+        style="display: none"
+      >
+        ✨ 이 앱을 **홈 화면에 추가**하고, 오프라인에서도 **앱처럼 편리하게**
+        이용해 보세요! (브라우저 메뉴에서 '홈 화면에 추가' 또는 '앱 설치' 버튼을
+        찾아보세요!)
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
       </div>
 
-      <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+      <div class="form-check form-switch mb-3 text-end">
+        <input class="form-check-input" type="checkbox" id="darkModeSwitch" />
+        <label class="form-check-label" for="darkModeSwitch">다크 모드</label>
+      </div>
+
+      <ul class="nav nav-tabs nav-justified mb-4" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
           <button
             class="nav-link active"
@@ -54,7 +70,7 @@
             aria-controls="expense"
             aria-selected="true"
           >
-            가계부
+            <i class="bi bi-wallet"></i> 가계부
           </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -68,7 +84,7 @@
             aria-controls="todo"
             aria-selected="false"
           >
-            할 일
+            <i class="bi bi-card-checklist"></i> 할 일
           </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -82,7 +98,7 @@
             aria-controls="habit"
             aria-selected="false"
           >
-            습관
+            <i class="bi bi-repeat"></i> 습관 추적기
           </button>
         </li>
       </ul>
@@ -94,68 +110,53 @@
           role="tabpanel"
           aria-labelledby="expense-tab"
         >
-          <div class="card p-4 shadow-sm">
-            <h2 class="mb-3">가계부</h2>
+          <div class="card p-4 mb-4">
+            <h2 class="card-title text-center mb-3">가계부</h2>
             <form id="expense-form">
               <div class="mb-3">
-                <label for="date" class="form-label">날짜</label>
-                <input type="date" class="form-control" id="date" required />
-              </div>
-              <div class="mb-3">
-                <label for="item" class="form-label">항목</label>
+                <label for="expense-description" class="form-label">내역</label>
                 <input
                   type="text"
                   class="form-control"
-                  id="item"
+                  id="expense-description"
                   placeholder="예: 점심 식사, 월급"
                   required
                 />
               </div>
               <div class="mb-3">
-                <label for="amount" class="form-label">금액</label>
+                <label for="expense-amount" class="form-label">금액</label>
                 <input
                   type="number"
                   class="form-control"
-                  id="amount"
+                  id="expense-amount"
                   placeholder="금액 입력"
                   required
+                  min="1"
                 />
               </div>
               <div class="mb-3">
-                <label for="type" class="form-label">유형</label>
-                <select class="form-select" id="type">
+                <label for="expense-type" class="form-label">유형</label>
+                <select class="form-select" id="expense-type" required>
                   <option value="expense">지출</option>
                   <option value="income">수입</option>
                 </select>
               </div>
-              <div class="mb-3">
-                <label for="memo" class="form-label">메모 (선택 사항)</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="memo"
-                  placeholder="메모 입력"
-                />
-              </div>
-              <button type="submit" class="btn btn-primary">기록 추가</button>
+              <button type="submit" class="btn btn-primary w-100">추가</button>
             </form>
+          </div>
 
-            <hr class="my-4" />
-
-            <h3>내역</h3>
-            <div class="d-flex justify-content-between mb-3">
-              <div>
-                총 수입:
-                <span id="total-income" class="fw-bold text-success">0원</span>
+          <div class="card p-4">
+            <h3 class="mb-3">내역</h3>
+            <ul class="list-group mb-3" id="expense-list"></ul>
+            <div class="row text-center fw-bold">
+              <div class="col">
+                수입: <span id="total-income" class="text-success">0원</span>
               </div>
-              <div>
-                총 지출:
-                <span id="total-expense" class="fw-bold text-danger">0원</span>
+              <div class="col">
+                지출: <span id="total-expense" class="text-danger">0원</span>
               </div>
-              <div>잔액: <span id="balance" class="fw-bold">0원</span></div>
+              <div class="col">잔액: <span id="balance">0원</span></div>
             </div>
-
-            <ul id="expense-list" class="list-group"></ul>
           </div>
         </div>
 
@@ -165,40 +166,41 @@
           role="tabpanel"
           aria-labelledby="todo-tab"
         >
-          <div class="card p-4 shadow-sm">
-            <h2 class="mb-3">할 일 목록</h2>
-            <form id="todo-form" class="mb-4">
+          <div class="card p-4 mb-4">
+            <h2 class="card-title text-center mb-3">할 일 목록</h2>
+            <form id="todo-form">
               <div class="mb-3">
                 <label for="todo-text" class="form-label">할 일</label>
                 <input
                   type="text"
                   class="form-control"
                   id="todo-text"
-                  placeholder="예: 보고서 작성, 장보기"
+                  placeholder="할 일 입력"
                   required
                 />
               </div>
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <label for="todo-due-date" class="form-label"
-                    >마감일 (선택)</label
-                  >
-                  <input type="date" class="form-control" id="todo-due-date" />
-                </div>
-                <div class="col-md-6">
-                  <label for="todo-priority" class="form-label">우선순위</label>
-                  <select class="form-select" id="todo-priority">
-                    <option value="low">낮음</option>
-                    <option value="medium" selected>중간</option>
-                    <option value="high">높음</option>
-                  </select>
-                </div>
+              <div class="mb-3">
+                <label for="todo-priority" class="form-label">우선순위</label>
+                <select class="form-select" id="todo-priority" required>
+                  <option value="high">높음</option>
+                  <option value="medium">보통</option>
+                  <option value="low">낮음</option>
+                </select>
               </div>
-              <button type="submit" class="btn btn-primary">할 일 추가</button>
+              <button type="submit" class="btn btn-primary w-100">추가</button>
             </form>
+          </div>
 
-            <h4>내 할 일</h4>
-            <ul id="todo-list" class="list-group"></ul>
+          <div class="card p-4">
+            <h3 class="mb-3">나의 할 일</h3>
+            <div class="mb-3">
+              <select class="form-select" id="todo-filter">
+                <option value="all">모두 보기</option>
+                <option value="active">진행 중</option>
+                <option value="completed">완료</option>
+              </select>
+            </div>
+            <ul class="list-group" id="todo-list"></ul>
           </div>
         </div>
 
@@ -208,40 +210,38 @@
           role="tabpanel"
           aria-labelledby="habit-tab"
         >
-          <div class="card p-4 shadow-sm">
-            <h2 class="mb-3">습관 추적기</h2>
-            <form id="habit-form" class="mb-4">
+          <div class="card p-4 mb-4">
+            <h2 class="card-title text-center mb-3">습관 추적기</h2>
+            <form id="habit-form">
               <div class="mb-3">
-                <label for="habit-name" class="form-label">새 습관 이름</label>
+                <label for="habit-name" class="form-label">습관 이름</label>
                 <input
                   type="text"
                   class="form-control"
                   id="habit-name"
-                  placeholder="예: 매일 운동하기, 아침 독서 30분"
+                  placeholder="예: 물 마시기, 운동하기"
                   required
                 />
               </div>
-              <button type="submit" class="btn btn-primary">습관 추가</button>
+              <button type="submit" class="btn btn-primary w-100">
+                새 습관 추가
+              </button>
             </form>
+          </div>
 
-            <hr class="my-4" />
-
-            <h4 class="mb-3">등록된 습관들</h4>
-            <ul id="active-habit-list" class="list-group mb-4"></ul>
-
-            <hr class="my-4" />
-
-            <h4 class="mb-3">습관 달력</h4>
+          <div class="card p-4 mb-4">
+            <h3 class="mb-3">나의 습관</h3>
+            <ul class="list-group mb-3" id="habit-list"></ul>
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <button class="btn btn-outline-secondary" id="prev-month-btn">
-                &lt; 이전 달
+              <button class="btn btn-outline-secondary" id="prev-month">
+                <i class="bi bi-chevron-left"></i> 이전 달
               </button>
               <h4 id="current-month-year" class="mb-0"></h4>
-              <button class="btn btn-outline-secondary" id="next-month-btn">
-                다음 달 &gt;
+              <button class="btn btn-outline-secondary" id="next-month">
+                다음 달 <i class="bi bi-chevron-right"></i>
               </button>
             </div>
-            <div class="calendar-grid-header">
+            <div class="calendar-grid-header mb-2">
               <div class="day-label">일</div>
               <div class="day-label">월</div>
               <div class="day-label">화</div>
@@ -250,74 +250,18 @@
               <div class="day-label">금</div>
               <div class="day-label">토</div>
             </div>
-            <div id="calendar-days-grid" class="calendar-grid-days mb-4"></div>
-
-            <hr class="my-4" />
-            <h4 class="mb-3">습관 통계</h4>
-            <div id="habit-stats" class="row mb-4">
-              <p class="text-muted text-center" id="no-habit-stats-message">
-                등록된 습관이 없습니다.
-              </p>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <div class="card p-3 h-100">
-                  <h5 class="mb-3">월별 습관 실천 횟수</h5>
-                  <canvas id="monthlyPracticeChart"></canvas>
-                  <p
-                    class="text-muted text-center mt-2"
-                    id="no-monthly-chart-data"
-                  >
-                    데이터가 부족합니다.
-                  </p>
-                </div>
-              </div>
-              <div class="col-md-6 mb-4">
-                <div class="card p-3 h-100">
-                  <h5 class="mb-3">전체 습관 실천 비율 (상위 5개)</h5>
-                  <canvas id="overallPracticeChart"></canvas>
-                  <p
-                    class="text-muted text-center mt-2"
-                    id="no-overall-chart-data"
-                  >
-                    데이터가 부족합니다.
-                  </p>
-                </div>
-              </div>
-            </div>
+            <div class="calendar-grid-days" id="habit-calendar"></div>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <div
-      class="modal fade"
-      id="habitDetailModal"
-      tabindex="-1"
-      aria-labelledby="habitDetailModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="habitDetailModalLabel"></h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body" id="habitDetailModalBody"></div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
+          <div class="card p-4" id="habit-stats">
+            <h3 class="mb-3">습관 통계</h3>
+            <div
+              id="no-habit-stats-message"
+              class="text-center text-muted"
+              style="display: none"
             >
-              닫기
-            </button>
+              등록된 습관이 없습니다. 새로운 습관을 추가해보세요!
+            </div>
           </div>
         </div>
       </div>
@@ -332,6 +276,123 @@
     <script src="js/expense.js"></script>
     <script src="js/todo.js"></script>
     <script src="js/habit.js"></script>
+    <script src="js/charts.js"></script>
+
     <script src="js/main.js"></script>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/service-worker.js")
+            .then((registration) => {
+              console.log(
+                "Service Worker registered with scope:",
+                registration.scope
+              );
+            })
+            .catch((error) => {
+              console.log("Service Worker registration failed:", error);
+            });
+        });
+      }
+
+      // PWA 설치 프롬프트 이벤트 리스너 추가 (Android/Desktop Chrome)
+      let deferredPrompt;
+      window.addEventListener("beforeinstallprompt", (e) => {
+        // 설치 프롬프트를 나중에 트리거할 수 있도록 이벤트 저장
+        e.preventDefault();
+        deferredPrompt = e;
+        // 사용자에게 PWA 설치를 제안하는 메시지를 표시
+        const pwaPrompt = document.getElementById("pwa-install-prompt");
+        if (pwaPrompt) {
+          pwaPrompt.style.display = "block";
+        }
+      });
+
+      // 사용자가 PWA 설치 메시지 박스를 클릭했을 때 (옵션: alert 내부 버튼 등)
+      document
+        .getElementById("pwa-install-prompt")
+        ?.addEventListener("click", () => {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+              if (choiceResult.outcome === "accepted") {
+                console.log("User accepted the A2HS prompt");
+              } else {
+                console.log("User dismissed the A2HS prompt");
+              }
+              deferredPrompt = null; // 프롬프트는 한 번만 사용 가능
+              document.getElementById("pwa-install-prompt").style.display =
+                "none"; // 메시지 숨기기
+            });
+          }
+        });
+
+      // 탭 변경 시 호출될 함수 (필요에 따라 각 JS 파일에 통합 또는 main.js로 이동 가능)
+      document.addEventListener("DOMContentLoaded", () => {
+        const myTabEl = document.querySelector("#myTab");
+        if (myTabEl) {
+          myTabEl.addEventListener("shown.bs.tab", (event) => {
+            // 차트가 있는 탭으로 이동할 때 차트 다시 그리기
+            if (
+              event.target.id === "expense-tab" &&
+              typeof updateMonthlyChart === "function"
+            ) {
+              updateMonthlyChart();
+            } else if (event.target.id === "habit-tab") {
+              if (typeof updateHabitCalendar === "function") {
+                updateHabitCalendar(); // 습관 탭으로 이동 시 달력 업데이트
+              }
+              if (typeof updateHabitStats === "function") {
+                updateHabitStats(); // 습관 탭으로 이동 시 통계 업데이트
+              }
+            }
+          });
+        }
+
+        // 다크 모드 스위치 이벤트 리스너
+        const darkModeSwitch = document.getElementById("darkModeSwitch");
+        const currentTheme = localStorage.getItem("theme");
+
+        if (currentTheme) {
+          document.body.classList.add(currentTheme);
+          if (currentTheme === "dark-theme") {
+            darkModeSwitch.checked = true;
+          }
+        }
+
+        darkModeSwitch.addEventListener("change", () => {
+          if (darkModeSwitch.checked) {
+            document.body.classList.add("dark-theme");
+            localStorage.setItem("theme", "dark-theme");
+            // 다크 모드 시 Bootstrap Close 버튼 색상 조절을 위한 CSS 변수 설정
+            document.documentElement.style.setProperty(
+              "--dark-mode-filter",
+              "1"
+            );
+          } else {
+            document.body.classList.remove("dark-theme");
+            localStorage.setItem("theme", "light-theme");
+            // 라이트 모드 시 Bootstrap Close 버튼 색상 조절을 위한 CSS 변수 설정
+            document.documentElement.style.setProperty(
+              "--dark-mode-filter",
+              "0"
+            );
+          }
+          // 테마 변경 시 차트도 업데이트 (main.js 또는 charts.js에 정의된 함수 호출)
+          if (typeof updateChartsTheme === "function") {
+            updateChartsTheme();
+          }
+        });
+
+        // 초기 로드 시 다크 모드 스위치에 따라 Close 버튼 필터 설정
+        if (document.body.classList.contains("dark-theme")) {
+          document.documentElement.style.setProperty("--dark-mode-filter", "1");
+        } else {
+          document.documentElement.style.setProperty("--dark-mode-filter", "0");
+        }
+      });
+    </script>
   </body>
 </html>
