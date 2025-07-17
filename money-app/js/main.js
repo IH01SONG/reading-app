@@ -11,26 +11,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 2. 테마 토글 버튼 클릭 이벤트
   themeToggleButton.addEventListener("click", () => {
+    let newTheme;
     if (body.classList.contains("light-theme")) {
       body.classList.remove("light-theme");
       body.classList.add("dark-theme");
-      localStorage.setItem("theme", "dark-theme");
-      updateToggleButton("dark-theme");
+      newTheme = "dark-theme";
     } else {
       body.classList.remove("dark-theme");
       body.classList.add("light-theme");
-      localStorage.setItem("theme", "light-theme");
-      updateToggleButton("light-theme");
+      newTheme = "light-theme";
     }
+    localStorage.setItem("theme", newTheme);
+    updateToggleButton(newTheme);
+
     // 테마 변경 후 차트 다시 그리기 (색상 변경 적용)
-    if (typeof renderHabitStats === "function") {
-      renderHabitStats();
+    // 각 탭의 렌더링 함수가 전역으로 노출되어 있다고 가정
+    // 현재 활성화된 탭에 따라 해당 탭의 렌더링 함수를 호출
+    const activeTab = document.querySelector(".nav-link.active");
+    if (activeTab) {
+      const activeTabId = activeTab.id;
+      if (
+        activeTabId === "expense-tab" &&
+        typeof window.renderTransactions === "function"
+      ) {
+        window.renderTransactions();
+      } else if (
+        activeTabId === "todo-tab" &&
+        typeof window.renderTodos === "function"
+      ) {
+        window.renderTodos();
+      } else if (
+        activeTabId === "habit-tab" &&
+        typeof window.renderHabitStats === "function"
+      ) {
+        // 습관 탭은 통계만 새로 그리면 됨
+        window.renderHabitStats();
+      }
     }
   });
 
   // 3. 버튼 텍스트와 아이콘 업데이트 함수
   function updateToggleButton(currentTheme) {
-    const icon = themeToggleButton.querySelector("i");
+    const icon = themeToggleButton.querySelector("i"); // 아이콘 요소가 버튼 내부에 직접 포함되어 있으므로 다시 찾음
     if (currentTheme === "dark-theme") {
       themeToggleButton.innerHTML =
         '<i class="bi bi-sun-fill me-2"></i>라이트 모드';
@@ -44,12 +66,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 4. Bootstrap 탭 이벤트 리스너 (기존 탭 전환 로직 유지)
+  // 4. Bootstrap 탭 이벤트 리스너 (탭 전환 시 해당 탭 렌더링)
   const myTab = document.getElementById("myTab");
   if (myTab) {
     myTab.addEventListener("shown.bs.tab", function (e) {
       const activeTabId = e.target.id;
-      // 각 JS 파일의 렌더링 함수를 전역으로 호출 (window 객체에 추가했다고 가정)
       if (
         activeTabId === "expense-tab" &&
         typeof window.renderTransactions === "function"
@@ -64,23 +85,15 @@ document.addEventListener("DOMContentLoaded", () => {
         activeTabId === "habit-tab" &&
         typeof window.renderHabits === "function"
       ) {
-        // habit 탭의 경우 모든 하위 렌더링 함수를 호출하도록 renderHabits를 직접 정의해야 함
-        // 또는 habit.js에서 하나의 main render 함수로 통합
-        window.renderHabits(); // 이 함수는 habit.js에 정의된 모든 렌더링을 포함해야 함
+        // 습관 탭은 모든 요소를 다시 렌더링해야 함 (달력, 목록, 통계)
+        window.renderHabits();
       }
     });
   }
 
-  // 초기 렌더링 함수들을 전역으로 노출
-  // 각 JS 파일 (expense.js, todo.js, habit.js)의 맨 위나 필요한 함수 정의 후 추가
-  // 예:
-  // // expense.js
-  // window.renderTransactions = renderTransactions;
-  //
-  // // todo.js
-  // window.renderTodos = renderTodos;
-  //
-  // // habit.js
-  // window.renderHabits = () => { renderActiveHabitList(); renderIntegratedCalendar(); renderHabitStats(); };
-  // window.renderHabitStats = renderHabitStats; // 차트 업데이트를 위해 통계 렌더링 함수도 노출
+  // 5. 각 JS 파일의 초기 렌더링 함수를 DOMContentLoaded에서 직접 호출
+  // 각 스크립트 파일은 이제 자체적으로 DOMContentLoaded 리스너를 가지고 있으며,
+  // 그 내부에서 초기 렌더링을 수행하고, window 객체에 필요한 함수들을 노출합니다.
+  // 따라서 이 main.js의 DOMContentLoaded 에서는 별도의 초기 렌더링 호출은 필요 없습니다.
+  // 탭 전환 시에만 각 탭의 렌더링 함수를 호출하면 됩니다.
 });

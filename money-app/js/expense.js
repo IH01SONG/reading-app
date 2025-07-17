@@ -1,3 +1,5 @@
+// js/expense.js
+
 document.addEventListener("DOMContentLoaded", () => {
   const expenseForm = document.getElementById("expense-form");
   const expenseList = document.getElementById("expense-list");
@@ -7,11 +9,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
-  // 거래 내역을 화면에 렌더링하고 잔액을 업데이트하는 함수
+  function saveTransactions() {
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+  }
+
   function renderTransactions() {
-    expenseList.innerHTML = ""; // 기존 목록 초기화
+    expenseList.innerHTML = "";
     let totalIncome = 0;
     let totalExpense = 0;
+
+    // 최신순으로 정렬 (날짜, 시간 모두 고려)
+    transactions.sort(
+      (a, b) =>
+        new Date(b.date + "T" + (b.time || "00:00:00")) -
+        new Date(a.date + "T" + (a.time || "00:00:00"))
+    );
 
     transactions.forEach((transaction) => {
       const listItem = document.createElement("li");
@@ -19,24 +31,36 @@ document.addEventListener("DOMContentLoaded", () => {
         "list-group-item",
         "d-flex",
         "justify-content-between",
-        "align-items-center"
+        "align-items-center",
+        "mb-2",
+        "shadow-sm"
       );
 
-      const amountClass = transaction.type === "income" ? "income" : "expense";
+      const typeClass =
+        transaction.type === "income" ? "text-success" : "text-danger";
       const sign = transaction.type === "income" ? "+" : "-";
+
+      // 날짜와 시간 포맷 개선
+      const displayDate = transaction.date;
+      const displayTime = transaction.time
+        ? ` ${transaction.time.substring(0, 5)}`
+        : ""; // 시:분만 표시
 
       listItem.innerHTML = `
                 <div>
+                    <small class="text-muted">${displayDate}${displayTime}</small><br>
                     <strong>${transaction.item}</strong>
-                    <small class="text-muted d-block">${transaction.date} - ${
-        transaction.memo ? transaction.memo : ""
-      }</small>
+                    <p class="mb-0 text-muted small">${
+                      transaction.memo || ""
+                    }</p>
                 </div>
-                <div class="amount ${amountClass}">
-                    ${sign}${transaction.amount.toLocaleString()}원
-                    <button class="btn btn-sm btn-danger ms-2" data-id="${
+                <div class="d-flex align-items-center">
+                    <span class="amount fw-bold ${typeClass}">${sign}${transaction.amount.toLocaleString()}원</span>
+                    <button class="btn btn-sm btn-outline-danger ms-3" data-id="${
                       transaction.id
-                    }">삭제</button>
+                    }">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </div>
             `;
       expenseList.appendChild(listItem);
@@ -54,60 +78,81 @@ document.addEventListener("DOMContentLoaded", () => {
     totalExpenseSpan.textContent = `${totalExpense.toLocaleString()}원`;
     balanceSpan.textContent = `${balance.toLocaleString()}원`;
 
-    // 잔액에 따라 색상 변경
-    if (balance < 0) {
-      balanceSpan.classList.remove("text-success");
-      balanceSpan.classList.add("text-danger");
-    } else if (balance > 0) {
+    // 잔액에 따른 색상 변경
+    if (balance > 0) {
       balanceSpan.classList.remove("text-danger");
       balanceSpan.classList.add("text-success");
+    } else if (balance < 0) {
+      balanceSpan.classList.remove("text-success");
+      balanceSpan.classList.add("text-danger");
     } else {
       balanceSpan.classList.remove("text-success", "text-danger");
     }
   }
 
-  // 새 거래 추가
   expenseForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    const date = document.getElementById("date").value;
-    const item = document.getElementById("item").value;
-    const amount = parseInt(document.getElementById("amount").value);
-    const type = document.getElementById("type").value;
-    const memo = document.getElementById("memo").value;
+    const dateInput = document.getElementById("date");
+    const itemInput = document.getElementById("item");
+    const amountInput = document.getElementById("amount");
+    const typeInput = document.getElementById("type");
+    const memoInput = document.getElementById("memo");
 
-    if (date && item && amount) {
-      const newTransaction = {
-        id: Date.now(), // 고유 ID 생성
-        date,
-        item,
-        amount,
-        type,
-        memo,
-      };
-      transactions.push(newTransaction);
-      localStorage.setItem("transactions", JSON.stringify(transactions));
-      expenseForm.reset(); // 폼 초기화
-      renderTransactions(); // 목록 다시 렌더링
-    } else {
+    // 간단한 유효성 검사 (Bootstrap is-invalid 클래스 활용)
+    let isValid = true;
+    [dateInput, itemInput, amountInput].forEach((input) => {
+      input.classList.remove("is-invalid");
+      if (!input.value.trim()) {
+        input.classList.add("is-invalid");
+        isValid = false;
+      }
+    });
+
+    if (!isValid) {
       alert("날짜, 항목, 금액은 필수 입력 사항입니다.");
+      return;
     }
+
+    const amountValue = parseInt(amountInput.value);
+    if (isNaN(amountValue) || amountValue <= 0) {
+      amountInput.classList.add("is-invalid");
+      alert("금액은 0보다 큰 숫자여야 합니다.");
+      return;
+    }
+
+    const newTransaction = {
+      id: Date.now(), // 고유 ID 생성
+      date: dateInput.value,
+      // 현재 시간 추가 (같은 날 여러 기록 시 정렬을 위함)
+      time: new Date().toTimeString().split(" ")[0],
+      item: itemInput.value.trim(),
+      amount: amountValue,
+      type: typeInput.value,
+      memo: memoInput.value.trim(),
+    };
+
+    transactions.push(newTransaction);
+    saveTransactions();
+    expenseForm.reset(); // 폼 초기화
+    renderTransactions();
   });
 
-  // 거래 삭제
   expenseList.addEventListener("click", (e) => {
-    if (e.target.classList.contains("btn-danger")) {
-      const idToDelete = parseInt(e.target.dataset.id);
-      transactions = transactions.filter(
-        (transaction) => transaction.id !== idToDelete
-      );
-      localStorage.setItem("transactions", JSON.stringify(transactions));
-      renderTransactions();
+    if (e.target.closest(".btn-outline-danger")) {
+      const button = e.target.closest(".btn-outline-danger");
+      const transactionId = parseInt(button.dataset.id);
+      if (confirm("이 내역을 삭제하시겠습니까?")) {
+        transactions = transactions.filter((t) => t.id !== transactionId);
+        saveTransactions();
+        renderTransactions();
+      }
     }
   });
 
-  // 페이지 로드 시 초기 렌더링
+  // 초기 렌더링
   renderTransactions();
+
+  // main.js에서 호출할 수 있도록 함수를 전역으로 노출
+  window.renderTransactions = renderTransactions;
 });
-// 전역으로 노출 (main.js에서 호출할 수 있도록)
-window.renderTransactions = renderTransactions;

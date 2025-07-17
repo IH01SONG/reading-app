@@ -26,23 +26,23 @@
 
 /* 다크 테마 변수 (body에 .dark-theme 클래스가 있을 때 적용) */
 body.dark-theme {
-  --primary-color: #00ff00; /* 네온 그린 */
-  --primary-color-rgb: 0, 255, 0;
-  --secondary-color: #39ff14; /* 약간 다른 네온 그린 */
-  --success-color: #00b894; /* 기존 유지 (밝은 녹색은 너무 밝을 수 있음) */
+  --primary-color: #bfeb60; /* 새로운 네온 그린 */
+  --primary-color-rgb: 191, 235, 96; /* 새로운 네온 그린의 RGB 값 */
+  --secondary-color: #8cbb3b; /* 새로운 네온 그린의 살짝 어두운 변형 */
+  --success-color: #bfeb60; /* 성공 색상도 네온 그린으로 통일 */
   --danger-color: #ff6b6b; /* 어둠에 어울리는 빨강 */
   --warning-color: #ffe66d; /* 어둠에 어울리는 노랑 */
   --info-color: #4ecdc4; /* 어둠에 어울리는 파랑 */
 
   --background-color: #121212; /* 어두운 배경 */
   --card-background-color: #1e1e1e; /* 어두운 카드 배경 */
-  --text-color: #e0e0e0; /* 밝은 텍스트 */
+  --text-color: #bfeb60; /* **텍스트 색상을 새로운 네온 그린으로 변경** */
   --muted-text-color: #a0a0a0; /* 밝은 회색 텍스트 */
   --border-color: #333333; /* 어두운 경계선 */
   --input-bg-color: #2d2d2d; /* 입력 필드 배경 */
-  --input-text-color: #e0e0e0; /* 입력 필드 텍스트 */
+  --input-text-color: #bfeb60; /* 입력 필드 텍스트도 네온 그린으로 */
   --modal-bg-color: #1e1e1e; /* 모달 배경 */
-  --modal-text-color: #e0e0e0; /* 모달 텍스트 */
+  --modal-text-color: #bfeb60; /* 모달 텍스트도 네온 그린으로 */
   --nav-link-color: #a0a0a0; /* 탭 버튼 텍스트 */
   --nav-link-active-bg: #2d2d2d; /* 활성 탭 배경 */
   --nav-link-active-border-color: #333333 #333333 #1e1e1e; /* 활성 탭 테두리 */
@@ -156,7 +156,7 @@ h6 {
 }
 #total-income {
   color: var(--success-color) !important;
-}
+} /* 다크모드에서 primary-color로 변경됨 */
 #total-expense {
   color: var(--danger-color) !important;
 }
@@ -190,15 +190,42 @@ h6 {
 }
 
 /* 습관 추적기 달력 스타일 */
+/* 달력 그리드 컨테이너 */
+.calendar-grid-header,
+.calendar-grid-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7개의 동일한 너비의 컬럼 */
+  gap: 5px; /* 셀 간 간격 */
+  text-align: center;
+}
+
+.calendar-grid-header {
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: var(--primary-color); /* 요일 글자색 네온 그린 */
+}
+
 .day-label {
-  color: var(--primary-color);
-} /* 요일 글자색 네온 그린 */
+  padding: 10px 0;
+  color: var(--primary-color); /* 요일 글자색 네온 그린 */
+}
+
 .calendar-day {
   background-color: var(--input-bg-color); /* 입력 필드와 동일하게 */
-  border-color: var(--border-color);
+  border: 1px solid var(--border-color);
   color: var(--text-color);
+  padding: 15px 5px; /* 셀 내부 여백 */
+  min-height: 60px; /* 최소 높이 설정 */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* 상단 정렬 */
+  align-items: center; /* 중앙 정렬 */
+  font-size: 1.1em;
+  cursor: pointer;
+  border-radius: 5px;
   transition: background-color 0.3s ease, border-color 0.3s ease,
     color 0.3s ease;
+  position: relative; /* 자식 요소 위치 지정을 위해 */
 }
 .calendar-day:hover {
   background-color: var(--secondary-color); /* 호버 시 밝은 보라/네온 그린 */
@@ -228,14 +255,43 @@ h6 {
   box-shadow: 0 0 8px rgba(var(--primary-color-rgb), 0.7); /* 더 선명한 그림자 */
 }
 
+/* 습관 달력 내 체크 아이콘 */
+.habit-indicators {
+  position: absolute; /* 날짜 숫자 아래에 위치 */
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2px;
+}
 .habit-indicators i.text-success {
-  color: var(--primary-color) !important;
-} /* 달력 체크 아이콘도 네온 그린 */
+  color: var(--primary-color) !important; /* 달력 체크 아이콘도 네온 그린 */
+  font-size: 0.7em; /* 작은 크기 */
+}
 
 /* 통계 카드 스타일 (기존 카드 스타일 따름) */
 #habit-stats .card {
   background-color: var(--card-background-color);
   border-color: var(--border-color);
+}
+
+/* 습관 통계 내부 텍스트 색상 명확히 지정 */
+#habit-stats .card h5,
+#habit-stats .card p,
+#habit-stats .card .badge {
+  color: var(--text-color) !important; /* 통계 텍스트도 네온 그린으로 */
+}
+/* 뱃지 배경색은 그대로 유지하고 텍스트만 변경 */
+#habit-stats .card .badge {
+  /* 뱃지 자체의 배경색은 Bootstrap 클래스 (bg-primary, bg-success 등)에 의해 결정되므로,
+       여기서는 텍스트 색상만 var(--text-color)로 오버라이드합니다.
+       단, 다크 모드에서는 뱃지 텍스트가 배경색(var(--background-color))과 대비되도록 설정하는 것이 더 좋습니다.
+       따라서, 뱃지 텍스트는 var(--background-color)로 변경합니다. */
+  color: var(--background-color) !important;
+}
+/* 통계 메시지 색상 */
+#no-habit-stats-message {
+  color: var(--muted-text-color) !important;
 }
 
 /* 모달 스타일 */
@@ -253,12 +309,24 @@ h6 {
   border-top-color: var(--border-color);
 }
 .btn-close {
-  filter: invert(var(--dark-mode-filter, 0)); /* 테마에 따라 X 버튼 색상 반전 */
+  /* 닫기 버튼 X 색상을 다크모드에서 밝게 보이도록 */
+  filter: invert(
+    var(--dark-mode-filter, 0)
+  ); /* light: 0, dark: 1 (js에서 설정) */
   transition: filter 0.3s ease;
 }
+body.dark-theme .btn-close {
+  filter: invert(1); /* 다크 모드에서 X 버튼을 흰색으로 */
+}
 
-/* 차트 색상 (Chart.js는 JS에서 직접 색상 설정하므로, 여기서는 차트 배경 정도만) */
+/* 차트 배경색 */
 canvas {
   background-color: var(--input-bg-color); /* 차트 배경색 */
   border-radius: 5px;
+}
+
+/* 차트 데이터 없을 때 메시지 */
+#no-monthly-chart-data,
+#no-overall-chart-data {
+  color: var(--muted-text-color) !important;
 }

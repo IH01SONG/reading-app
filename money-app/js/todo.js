@@ -6,26 +6,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let todos = JSON.parse(localStorage.getItem("todos")) || [];
 
-  // To-Do 항목을 화면에 렌더링하는 함수
-  function renderTodos() {
-    todoList.innerHTML = ""; // 기존 목록 초기화
+  function saveTodos() {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }
 
-    // 마감일이 가까운 순으로 정렬 (선택 사항)
+  function renderTodos() {
+    todoList.innerHTML = "";
+
+    // 정렬: 미완료 > 마감일 임박 > 우선순위 높음 > 생성일 최신순
     todos.sort((a, b) => {
+      // 1. 완료 여부: 미완료 (false)가 완료 (true)보다 앞에
       if (a.completed !== b.completed) {
-        return a.completed ? 1 : -1; // 완료된 항목은 뒤로
+        return a.completed ? 1 : -1;
       }
-      if (a.dueDate && b.dueDate) {
-        return new Date(a.dueDate) - new Date(b.dueDate);
+
+      // 2. 마감일 (due date) 기준: 임박한 순서 (날짜 없는 것이 뒤로)
+      const dateA = a.dueDate ? new Date(a.dueDate) : null;
+      const dateB = b.dueDate ? new Date(b.dueDate) : null;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // 오늘 날짜만 비교
+
+      if (dateA && dateB) {
+        // 둘 다 마감일이 있으면 더 가까운 날짜가 먼저
+        return dateA.getTime() - dateB.getTime();
+      } else if (dateA) {
+        // A만 마감일이 있으면 A가 먼저
+        return -1;
+      } else if (dateB) {
+        // B만 마감일이 있으면 B가 먼저
+        return 1;
       }
-      if (a.dueDate) return -1;
-      if (b.dueDate) return 1;
-      return 0;
+
+      // 3. 우선순위 (high > medium > low)
+      const priorityOrder = { high: 3, medium: 2, low: 1 };
+      if (priorityOrder[b.priority] !== priorityOrder[a.priority]) {
+        return priorityOrder[b.priority] - priorityOrder[a.priority];
+      }
+
+      // 4. 생성일 (최신순) - 동일 조건일 경우 나중에 생성된 것이 앞에
+      return b.createdAt - a.createdAt;
     });
 
     if (todos.length === 0) {
       todoList.innerHTML =
-        '<li class="list-group-item text-muted text-center">아직 할 일이 없습니다.</li>';
+        '<li class="list-group-item text-muted text-center">아직 등록된 할 일이 없습니다.</li>';
       return;
     }
 
@@ -36,170 +60,168 @@ document.addEventListener("DOMContentLoaded", () => {
         "d-flex",
         "justify-content-between",
         "align-items-center",
-        "my-1", // 여백 추가
-        `priority-${todo.priority}` // 우선순위에 따른 클래스
+        "mb-2",
+        "shadow-sm"
       );
 
       // 완료된 할 일에 대한 스타일
       if (todo.completed) {
-        listItem.classList.add("list-group-item-secondary", "completed-todo");
+        listItem.classList.add(
+          "list-group-item-secondary",
+          "text-decoration-line-through"
+        );
       }
 
-      // 마감일이 지났거나 임박한 할 일에 대한 경고
-      let dueDateText = todo.dueDate ? ` (마감: ${todo.dueDate})` : "";
+      // 마감일 관련 클래스 추가
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
       if (todo.dueDate && !todo.completed) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const due = new Date(todo.dueDate);
-        due.setHours(0, 0, 0, 0);
-
-        if (due < today) {
+        const dueDateObj = new Date(todo.dueDate);
+        dueDateObj.setHours(0, 0, 0, 0);
+        if (dueDateObj < today) {
           listItem.classList.add("list-group-item-danger"); // 마감일 지남
-          dueDateText += " - 기한 지남!";
-        } else if (due.getTime() === today.getTime()) {
-          listItem.classList.add("list-group-item-warning"); // 오늘 마감
-          dueDateText += " - 오늘 마감!";
+        } else if (dueDateObj.getTime() === today.getTime()) {
+          listItem.classList.add("list-group-item-warning"); // 오늘이 마감일
         }
       }
 
+      // 우선순위 뱃지 색상 클래스 매핑
+      let priorityBadgeClass = "";
+      switch (todo.priority) {
+        case "high":
+          priorityBadgeClass = "bg-danger";
+          break;
+        case "medium":
+          priorityBadgeClass = "bg-warning";
+          break;
+        case "low":
+          priorityBadgeClass = "bg-info";
+          break;
+      }
+
       listItem.innerHTML = `
-                <div class="form-check d-flex align-items-center">
+                <div class="form-check d-flex align-items-center flex-grow-1">
                     <input class="form-check-input me-2" type="checkbox" data-id="${
                       todo.id
                     }" ${todo.completed ? "checked" : ""}>
-                    <label class="form-check-label ${
-                      todo.completed ? "text-muted" : ""
-                    }">
-                        <strong class="${
-                          todo.completed ? "text-decoration-line-through" : ""
-                        }">${todo.text}</strong>
-                        <small class="d-block text-muted">${dueDateText}</small>
-                        <span class="badge bg-${getPriorityBadgeColor(
-                          todo.priority
-                        )} ms-2">${getPriorityText(todo.priority)}</span>
-                    </label>
+                    <div>
+                        <span class="d-block ${
+                          todo.completed ? "text-muted" : ""
+                        }">${todo.text}</span>
+                        <div class="d-flex flex-wrap align-items-center mt-1">
+                            ${
+                              todo.dueDate
+                                ? `<small class="text-muted me-2"><i class="bi bi-calendar"></i> ${todo.dueDate}</small>`
+                                : ""
+                            }
+                            <span class="badge ${priorityBadgeClass} me-2">${
+        todo.priority === "low"
+          ? "낮음"
+          : todo.priority === "medium"
+          ? "중간"
+          : "높음"
+      }</span>
+                            <small class="text-muted fst-italic">생성: ${new Date(
+                              todo.createdAt
+                            ).toLocaleDateString()}</small>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <button class="btn btn-sm btn-outline-secondary me-1" data-id="${
                       todo.id
-                    }" data-action="edit">편집</button>
+                    }" data-action="edit">
+                        <i class="bi bi-pencil"></i>
+                    </button>
                     <button class="btn btn-sm btn-outline-danger" data-id="${
                       todo.id
-                    }" data-action="delete">삭제</button>
+                    }" data-action="delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </div>
             `;
       todoList.appendChild(listItem);
     });
   }
 
-  // 우선순위 뱃지 색상 헬퍼
-  function getPriorityBadgeColor(priority) {
-    switch (priority) {
-      case "high":
-        return "danger";
-      case "medium":
-        return "warning";
-      case "low":
-        return "info";
-      default:
-        return "secondary";
-    }
-  }
-
-  // 우선순위 텍스트 헬퍼
-  function getPriorityText(priority) {
-    switch (priority) {
-      case "high":
-        return "높음";
-      case "medium":
-        return "중간";
-      case "low":
-        return "낮음";
-      default:
-        return "미정";
-    }
-  }
-
-  // 할 일 추가
   todoForm.addEventListener("submit", (e) => {
     e.preventDefault();
-
     const todoTextInput = document.getElementById("todo-text");
     const todoDueDateInput = document.getElementById("todo-due-date");
-    const todoPrioritySelect = document.getElementById("todo-priority");
+    const todoPriorityInput = document.getElementById("todo-priority");
 
     const text = todoTextInput.value.trim();
-    const dueDate = todoDueDateInput.value; // YYYY-MM-DD 형식
-    const priority = todoPrioritySelect.value;
+    const dueDate = todoDueDateInput.value;
+    const priority = todoPriorityInput.value;
 
+    // 유효성 검사 (Bootstrap is-invalid 활용)
+    todoTextInput.classList.remove("is-invalid");
     if (text === "") {
-      alert("할 일 내용을 입력해주세요.");
+      todoTextInput.classList.add("is-invalid");
+      alert("할 일을 입력해주세요.");
       return;
     }
 
     const newTodo = {
-      id: Date.now(),
+      id: Date.now(), // 고유 ID (생성 시간)
       text,
-      dueDate,
+      dueDate: dueDate || null, // 마감일이 없으면 null
       priority,
-      completed: false, // 초기에는 완료되지 않음
+      completed: false,
+      createdAt: Date.now(), // 생성 시간 추가
     };
-
     todos.push(newTodo);
-    localStorage.setItem("todos", JSON.stringify(todos));
-    todoForm.reset(); // 폼 초기화
-    renderTodos(); // 목록 다시 렌더링
+    saveTodos();
+    todoForm.reset();
+    renderTodos();
   });
 
-  // 할 일 완료, 편집, 삭제 처리 (이벤트 위임)
   todoList.addEventListener("click", (e) => {
-    const id = parseInt(e.target.dataset.id);
-    const todoIndex = todos.findIndex((todo) => todo.id === id);
+    const target = e.target;
+    const id = parseInt(target.dataset.id);
 
-    if (todoIndex === -1) return; // 해당 ID의 할 일을 찾지 못하면 종료
-
-    // 완료 체크박스 클릭
-    if (e.target.type === "checkbox") {
-      todos[todoIndex].completed = e.target.checked;
-    }
-    // 삭제 버튼 클릭
-    else if (e.target.dataset.action === "delete") {
+    if (target.type === "checkbox") {
+      const todoIndex = todos.findIndex((todo) => todo.id === id);
+      if (todoIndex !== -1) {
+        todos[todoIndex].completed = target.checked;
+        saveTodos();
+        renderTodos();
+      }
+    } else if (
+      target.dataset.action === "delete" ||
+      target.closest('[data-action="delete"]')
+    ) {
+      const deleteId =
+        id || parseInt(target.closest('[data-action="delete"]').dataset.id);
       if (confirm("정말 이 할 일을 삭제하시겠습니까?")) {
-        todos.splice(todoIndex, 1);
+        todos = todos.filter((todo) => todo.id !== deleteId);
+        saveTodos();
+        renderTodos();
       }
-    }
-    // 편집 버튼 클릭
-    else if (e.target.dataset.action === "edit") {
-      const todo = todos[todoIndex];
-      const newText = prompt("할 일 내용을 수정해주세요:", todo.text);
-      if (newText !== null && newText.trim() !== "") {
-        todo.text = newText.trim();
-        const newDueDate = prompt(
-          "마감일을 수정해주세요 (YYYY-MM-DD):",
-          todo.dueDate || ""
-        );
-        todo.dueDate = newDueDate;
-
-        const newPriority = prompt(
-          "우선순위를 수정해주세요 (high, medium, low):",
-          todo.priority
-        );
-        if (["high", "medium", "low"].includes(newPriority)) {
-          todo.priority = newPriority;
-        } else {
-          alert("유효하지 않은 우선순위입니다. (high, medium, low 중 선택)");
+    } else if (
+      target.dataset.action === "edit" ||
+      target.closest('[data-action="edit"]')
+    ) {
+      const editId =
+        id || parseInt(target.closest('[data-action="edit"]').dataset.id);
+      const todoToEdit = todos.find((todo) => todo.id === editId);
+      if (todoToEdit) {
+        const newText = prompt("할 일을 수정해주세요:", todoToEdit.text);
+        if (newText !== null && newText.trim() !== "") {
+          todoToEdit.text = newText.trim();
+          saveTodos();
+          renderTodos();
+        } else if (newText !== null) {
+          // 사용자가 취소하지 않고 빈 문자열 입력
+          alert("할 일은 비워둘 수 없습니다.");
         }
-      } else if (newText !== null) {
-        alert("할 일 내용은 비워둘 수 없습니다.");
       }
     }
-
-    localStorage.setItem("todos", JSON.stringify(todos));
-    renderTodos(); // 변경 사항 반영하여 목록 다시 렌더링
   });
 
-  // 초기 로드 시 할 일 목록 렌더링
+  // 초기 렌더링
   renderTodos();
+
+  // main.js에서 호출할 수 있도록 함수를 전역으로 노출
+  window.renderTodos = renderTodos;
 });
-// 전역으로 노출 (main.js에서 호출할 수 있도록)
-window.renderTodos = renderTodos;
