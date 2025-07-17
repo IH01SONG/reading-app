@@ -68,11 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (typeof initTodoTab === "function") {
           initTodoTab();
         }
-      } else if (event.target.id === "habit-tab") {
-        if (typeof initHabitTab === "function") {
-          initHabitTab();
-        }
       }
+      // 습관 추적기 관련 로직 제거됨
     });
   }
 
@@ -110,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.documentElement.style.setProperty("--dark-mode-filter", "0");
   }
 
-  // 페이지 초기 로드 시 활성화된 탭의 내용 초기화 (아주 중요)
+  // 페이지 초기 로드 시 활성화된 탭의 내용 초기화
   const activeTabButton = document.querySelector("#myTab .nav-link.active");
   if (activeTabButton) {
     const activeTabId = activeTabButton.id;
@@ -122,10 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (typeof initTodoTab === "function") {
         initTodoTab();
       }
-    } else if (activeTabId === "habit-tab") {
-      if (typeof initHabitTab === "function") {
-        initHabitTab();
-      }
     }
+    // 습관 추적기 관련 로직 제거됨
   }
 });

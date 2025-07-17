@@ -6,6 +6,7 @@ let todos = JSON.parse(localStorage.getItem("todos")) || [];
 let todoForm;
 let todoText;
 let todoPriority;
+let todoDueDate; // 새로 추가된 마감 기한 입력 필드
 let todoFilter;
 let todoList;
 
@@ -16,6 +17,7 @@ function initTodoTab() {
     todoForm = document.getElementById("todo-form");
     todoText = document.getElementById("todo-text");
     todoPriority = document.getElementById("todo-priority");
+    todoDueDate = document.getElementById("todo-due-date"); // 요소 참조
     todoFilter = document.getElementById("todo-filter");
     todoList = document.getElementById("todo-list");
 
@@ -41,9 +43,10 @@ function handleTodoFormSubmit(e) {
   e.preventDefault();
   const text = todoText.value.trim();
   const priority = todoPriority.value;
+  const dueDate = todoDueDate.value; // 마감 기한 값 가져오기
   if (text === "") return;
 
-  todos.push({ id: Date.now(), text, completed: false, priority });
+  todos.push({ id: Date.now(), text, completed: false, priority, dueDate }); // dueDate 추가
   saveTodos();
 
   todoForm.reset();
@@ -73,10 +76,32 @@ function renderTodoList() {
     return true;
   });
 
-  // 우선순위에 따라 정렬: 높음 > 보통 > 낮음
+  // 우선순위와 마감 기한에 따라 정렬:
+  // 1. 미완료 항목이 완료 항목보다 먼저 (기본 필터링에서 이미 처리됨)
+  // 2. 우선순위: 높음 > 보통 > 낮음
+  // 3. 마감 기한이 빠른 순서 (마감 기한이 없는 것은 가장 뒤로)
   filteredTodos.sort((a, b) => {
+    // 완료 상태에 따른 정렬 (필터링 후에도 혹시 모를 경우 대비)
+    if (a.completed !== b.completed) {
+      return a.completed ? 1 : -1;
+    }
+
+    // 우선순위에 따른 정렬
     const priorityOrder = { high: 3, medium: 2, low: 1 };
-    return priorityOrder[b.priority] - priorityOrder[a.priority];
+    if (priorityOrder[b.priority] !== priorityOrder[a.priority]) {
+      return priorityOrder[b.priority] - priorityOrder[a.priority];
+    }
+
+    // 마감 기한에 따른 정렬
+    const dateA = a.dueDate ? new Date(a.dueDate) : null;
+    const dateB = b.dueDate ? new Date(b.dueDate) : null;
+
+    if (dateA && dateB) {
+      return dateA.getTime() - dateB.getTime();
+    }
+    if (dateA) return -1; // A만 마감 기한이 있으면 A가 먼저
+    if (dateB) return 1; // B만 마감 기한이 있으면 B가 먼저
+    return 0; // 둘 다 없으면 순서 유지
   });
 
   if (filteredTodos.length === 0) {
@@ -98,8 +123,34 @@ function renderTodoList() {
     else if (todo.priority === "medium") priorityClass = "text-warning";
     else if (todo.priority === "low") priorityClass = "text-info";
 
+    // D-day 계산 및 표시
+    let dueDateText = "";
+    if (todo.dueDate && !todo.completed) {
+      // 완료되지 않은 할 일에만 D-day 표시
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // 오늘 날짜의 자정으로 설정
+      const due = new Date(todo.dueDate);
+      due.setHours(0, 0, 0, 0); // 마감 기한 날짜의 자정으로 설정
+
+      const diffTime = due.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // 일 단위로 올림
+
+      if (diffDays === 0) {
+        dueDateText = '<span class="badge bg-danger ms-2">D-day</span>';
+      } else if (diffDays > 0) {
+        dueDateText = `<span class="badge bg-primary ms-2">D-${diffDays}</span>`;
+      } else {
+        // diffDays < 0 (마감 기한 지남)
+        dueDateText = `<span class="badge bg-secondary ms-2">D+${Math.abs(
+          diffDays
+        )}</span>`;
+      }
+    } else if (todo.dueDate && todo.completed) {
+      dueDateText = `<small class="text-muted ms-2">${todo.dueDate}</small>`; // 완료된 할 일은 날짜만 표시
+    }
+
     li.innerHTML = `
-            <div class="form-check d-flex align-items-center">
+            <div class="form-check d-flex align-items-center flex-grow-1">
                 <input type="checkbox" class="form-check-input me-2" ${
                   todo.completed ? "checked" : ""
                 } data-id="${todo.id}">
@@ -109,6 +160,7 @@ function renderTodoList() {
                     : ""
                 } ${priorityClass}">
                     ${todo.text}
+                    ${dueDateText}
                 </label>
             </div>
             <button class="btn btn-sm btn-outline-danger delete-todo-btn" data-id="${

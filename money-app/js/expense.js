@@ -6,6 +6,11 @@ let selectedCalendarDate = null; // To highlight selected date in calendar
 
 // DOM Elements - 이들은 initExpenseTab() 내부에서 한 번만 참조됩니다.
 let expenseForm;
+let expenseDescriptionInput; // input 요소 참조를 정확히 가져오도록 변수명 변경
+let expenseAmountInput; // input 요소 참조를 정확히 가져오도록 변수명 변경
+let expenseCategorySelect; // select 요소 참조를 정확히 가져오도록 변수명 변경
+let expenseTypeSelect; // select 요소 참조를 정확히 가져오도록 변수명 변경
+
 let expenseList;
 let totalIncomeSpan;
 let totalExpenseSpan;
@@ -21,7 +26,15 @@ let categorySummaryMessage;
 function initExpenseTab() {
   // 요소가 이미 초기화되었는지 확인하여 불필요한 재설정 방지
   if (!expenseForm) {
+    // 처음 로드될 때만 DOM 요소 참조 및 이벤트 리스너 등록
     expenseForm = document.getElementById("expense-form");
+
+    // 새로 추가된 input/select 요소 참조
+    expenseDescriptionInput = document.getElementById("expense-description");
+    expenseAmountInput = document.getElementById("expense-amount");
+    expenseCategorySelect = document.getElementById("expense-category");
+    expenseTypeSelect = document.getElementById("expense-type");
+
     expenseList = document.getElementById("expense-list");
     totalIncomeSpan = document.getElementById("total-income");
     totalExpenseSpan = document.getElementById("total-expense");
@@ -60,7 +73,6 @@ function initExpenseTab() {
 }
 
 function updateAllExpenseViews() {
-  saveExpenses(); // 데이터 저장 및 모든 뷰 업데이트 트리거
   updateSummary();
   renderExpenseList(selectedCalendarDate); // 선택된 날짜에 따라 내역 표시
   updateExpenseCalendar();
@@ -73,16 +85,22 @@ function updateAllExpenseViews() {
 
 function saveExpenses() {
   localStorage.setItem("expenses", JSON.stringify(expenses));
-  // 여기서 updateSummary, renderExpenseList 등을 직접 호출하지 않습니다.
-  // updateAllExpenseViews()가 이를 관리합니다.
+  // 이 부분이 핵심 변경: 데이터를 저장한 후, 화면을 즉시 업데이트하도록 호출합니다.
+  updateAllExpenseViews();
 }
 
 function handleExpenseFormSubmit(e) {
   e.preventDefault();
-  const description = document.getElementById("expense-description").value;
-  const amount = document.getElementById("expense-amount").value;
-  const category = document.getElementById("expense-category").value;
-  const type = document.getElementById("expense-type").value;
+  // DOM 요소에서 직접 value를 가져오도록 수정
+  const description = expenseDescriptionInput.value;
+  const amount = expenseAmountInput.value;
+  const category = expenseCategorySelect.value;
+  const type = expenseTypeSelect.value;
+
+  if (!description || !amount || parseFloat(amount) <= 0) {
+    alert("내역과 금액을 정확히 입력해주세요.");
+    return;
+  }
 
   const date = new Date().toISOString().split("T")[0]; // YYYY-MM-DD 형식
   expenses.push({
@@ -91,16 +109,18 @@ function handleExpenseFormSubmit(e) {
     category,
     type,
     date,
-  });
-  saveExpenses(); // 데이터 저장 (이 함수 내부에서 모든 뷰 업데이트 트리거)
+    id: Date.now(),
+  }); // 고유 ID 추가
+  saveExpenses(); // 데이터 저장 (이제 이 함수 내부에서 모든 뷰 업데이트 트리거)
 
   expenseForm.reset();
-  document.getElementById("expense-description").focus();
+  expenseDescriptionInput.focus(); // 첫 번째 입력 필드로 포커스 이동
 }
 
-function deleteExpense(index) {
-  expenses.splice(index, 1);
-  saveExpenses(); // 데이터 저장 (이 함수 내부에서 모든 뷰 업데이트 트리거)
+// ID를 기반으로 항목 삭제
+function deleteExpense(id) {
+  expenses = expenses.filter((item) => item.id !== id);
+  saveExpenses(); // 데이터 저장 및 모든 뷰 업데이트
 }
 
 function renderExpenseList(filterDate = null) {
@@ -116,15 +136,10 @@ function renderExpenseList(filterDate = null) {
   } else {
     const year = currentExpenseDate.getFullYear();
     const month = currentExpenseDate.getMonth();
-    const currentMonthStart = new Date(year, month, 1)
-      .toISOString()
-      .split("T")[0];
-    const currentMonthEnd = new Date(year, month + 1, 0)
-      .toISOString()
-      .split("T")[0];
-
+    // 현재 달의 내역만 필터링
     filteredExpenses = expenses.filter((item) => {
-      return item.date >= currentMonthStart && item.date <= currentMonthEnd;
+      const itemDate = new Date(item.date);
+      return itemDate.getFullYear() === year && itemDate.getMonth() === month;
     });
     if (filteredExpenses.length === 0) {
       expenseList.innerHTML =
@@ -132,19 +147,10 @@ function renderExpenseList(filterDate = null) {
     }
   }
 
-  filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date)); // 최신 내역부터
+  // 최신 내역부터 보이도록 정렬
+  filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   filteredExpenses.forEach((item) => {
-    // 원본 배열에서의 인덱스를 찾아야 정확하게 삭제 가능
-    const originalIndex = expenses.findIndex(
-      (exp) =>
-        exp.description === item.description &&
-        exp.amount === item.amount &&
-        exp.category === item.category &&
-        exp.type === item.type &&
-        exp.date === item.date
-    );
-
     const li = document.createElement("li");
     li.className =
       "list-group-item d-flex justify-content-between align-items-center";
@@ -160,18 +166,22 @@ function renderExpenseList(filterDate = null) {
     }</small>
             </div>
             <span class="fw-bold ${amountClass}">${sign}${item.amount.toLocaleString()}원</span>
-            <button class="btn btn-sm btn-outline-danger delete-expense-btn" data-index="${originalIndex}">
+            <button class="btn btn-sm btn-outline-danger delete-expense-btn" data-id="${
+              item.id
+            }">
                 <i class="bi bi-x-lg"></i>
             </button>
         `;
     expenseList.appendChild(li);
   });
 
-  // Delete button event listener
+  // Delete button event listener 등록 (매번 다시 렌더링되므로, 이 위치에서 등록해야 함)
   expenseList.querySelectorAll(".delete-expense-btn").forEach((button) => {
     button.addEventListener("click", (e) => {
-      const index = parseInt(e.currentTarget.dataset.index);
-      deleteExpense(index);
+      const id = parseInt(e.currentTarget.dataset.id);
+      if (confirm("이 내역을 삭제하시겠습니까?")) {
+        deleteExpense(id);
+      }
     });
   });
 }
@@ -182,15 +192,11 @@ function updateSummary() {
 
   const year = currentExpenseDate.getFullYear();
   const month = currentExpenseDate.getMonth();
-  const currentMonthStart = new Date(year, month, 1)
-    .toISOString()
-    .split("T")[0];
-  const currentMonthEnd = new Date(year, month + 1, 0)
-    .toISOString()
-    .split("T")[0];
 
+  // 현재 월의 내역만 요약
   expenses.forEach((item) => {
-    if (item.date >= currentMonthStart && item.date <= currentMonthEnd) {
+    const itemDate = new Date(item.date);
+    if (itemDate.getFullYear() === year && itemDate.getMonth() === month) {
       if (item.type === "income") {
         totalIncome += item.amount;
       } else {
@@ -318,14 +324,9 @@ function updateExpenseCategorySummary(filterDate = null) {
   } else {
     const year = currentExpenseDate.getFullYear();
     const month = currentExpenseDate.getMonth();
-    const currentMonthStart = new Date(year, month, 1)
-      .toISOString()
-      .split("T")[0];
-    const currentMonthEnd = new Date(year, month + 1, 0)
-      .toISOString()
-      .split("T")[0];
     filteredExpensesForSummary = expenses.filter((item) => {
-      return item.date >= currentMonthStart && item.date <= currentMonthEnd;
+      const itemDate = new Date(item.date);
+      return itemDate.getFullYear() === year && itemDate.getMonth() === month;
     });
   }
 
@@ -367,7 +368,6 @@ function updateExpenseCategorySummary(filterDate = null) {
       content += `<span class="category-amount text-danger">-${summary.expense.toLocaleString()}원</span>`;
     }
     content += `</div>`;
-    li.innerHTML = content;
     expenseCategorySummaryEl.appendChild(li);
     hasContent = true;
   }

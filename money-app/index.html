@@ -74,17 +74,17 @@
               </h6>
               <ol>
                 <li>
-                  앱처럼 사용하고 싶은 페이지에서 Chrome 브라우저 메뉴 (<i
+                  앱처럼 사용하고 싶은 페이지에서 **Chrome 브라우저 메뉴** (<i
                     class="bi bi-three-dots-vertical"
                   ></i>
                   또는 <i class="bi bi-three-dots"></i>)를 탭하세요.
                 </li>
                 <li>
-                  메뉴에서 '앱 설치' 또는 '홈 화면에 추가' 옵션을 찾아서
+                  메뉴에서 **'앱 설치'** 또는 **'홈 화면에 추가'** 옵션을 찾아서
                   탭하세요.
                 </li>
                 <li>
-                  확인 팝업이 나타나면 '설치' 버튼을 탭하면 홈 화면에
+                  확인 팝업이 나타나면 **'설치'** 버튼을 탭하면 홈 화면에
                   추가됩니다.
                 </li>
               </ol>
@@ -94,19 +94,19 @@
               </h6>
               <ol>
                 <li>
-                  Safari 브라우저에서 앱처럼 사용하고 싶은 페이지를 엽니다.
+                  **Safari 브라우저**에서 앱처럼 사용하고 싶은 페이지를 엽니다.
                   (다른 브라우저에서는 기능이 제한될 수 있습니다.)
                 </li>
                 <li>
-                  하단의 공유 버튼 (<i class="bi bi-share-fill"></i>)을
+                  하단의 **공유 버튼** (<i class="bi bi-share-fill"></i>)을
                   탭하세요.
                 </li>
                 <li>
-                  공유 메뉴에서 아래로 스크롤하여 '홈 화면에 추가' 옵션을 찾아서
-                  탭하세요.
+                  공유 메뉴에서 아래로 스크롤하여 **'홈 화면에 추가'** 옵션을
+                  찾아서 탭하세요.
                 </li>
                 <li>
-                  이름을 확인하고 '추가' 버튼을 탭하면 홈 화면에 아이콘이
+                  이름을 확인하고 **'추가'** 버튼을 탭하면 홈 화면에 아이콘이
                   생성됩니다.
                 </li>
               </ol>
@@ -156,20 +156,6 @@
             aria-selected="false"
           >
             <i class="bi bi-card-checklist"></i> 할 일
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button
-            class="nav-link"
-            id="habit-tab"
-            data-bs-toggle="tab"
-            data-bs-target="#habit"
-            type="button"
-            role="tab"
-            aria-controls="habit"
-            aria-selected="false"
-          >
-            <i class="bi bi-repeat"></i> 습관 추적기
           </button>
         </li>
       </ul>
@@ -306,6 +292,10 @@
                   <option value="low">낮음</option>
                 </select>
               </div>
+              <div class="mb-3">
+                <label for="todo-due-date" class="form-label">마감 기한</label>
+                <input type="date" class="form-control" id="todo-due-date" />
+              </div>
               <button type="submit" class="btn btn-primary w-100">추가</button>
             </form>
           </div>
@@ -322,67 +312,6 @@
             <ul class="list-group" id="todo-list"></ul>
           </div>
         </div>
-
-        <div
-          class="tab-pane fade"
-          id="habit"
-          role="tabpanel"
-          aria-labelledby="habit-tab"
-        >
-          <div class="card p-4 mb-4">
-            <h2 class="card-title text-center mb-3">습관 추적기</h2>
-            <form id="habit-form">
-              <div class="mb-3">
-                <label for="habit-name" class="form-label">습관 이름</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="habit-name"
-                  placeholder="예: 물 마시기, 운동하기"
-                  required
-                />
-              </div>
-              <button type="submit" class="btn btn-primary w-100">
-                새 습관 추가
-              </button>
-            </form>
-          </div>
-
-          <div class="card p-4 mb-4">
-            <h3 class="mb-3">나의 습관</h3>
-            <ul class="list-group mb-3" id="habit-list"></ul>
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <button class="btn btn-outline-secondary" id="prev-month">
-                <i class="bi bi-chevron-left"></i> 이전 달
-              </button>
-              <h4 id="current-month-year" class="mb-0"></h4>
-              <button class="btn btn-outline-secondary" id="next-month">
-                다음 달 <i class="bi bi-chevron-right"></i>
-              </button>
-            </div>
-            <div class="calendar-grid-header mb-2">
-              <div class="day-label">일</div>
-              <div class="day-label">월</div>
-              <div class="day-label">화</div>
-              <div class="day-label">수</div>
-              <div class="day-label">목</div>
-              <div class="day-label">금</div>
-              <div class="day-label">토</div>
-            </div>
-            <div class="calendar-grid-days" id="habit-calendar"></div>
-          </div>
-
-          <div class="card p-4" id="habit-stats">
-            <h3 class="mb-3">습관 통계</h3>
-            <div
-              id="no-habit-stats-message"
-              class="text-center text-muted"
-              style="display: none"
-            >
-              등록된 습관이 없습니다. 새로운 습관을 추가해보세요!
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -395,7 +324,6 @@
     <script src="js/main.js"></script>
     <script src="js/expense.js"></script>
     <script src="js/todo.js"></script>
-    <script src="js/habit.js"></script>
     <script src="js/charts.js"></script>
   </body>
 </html>
