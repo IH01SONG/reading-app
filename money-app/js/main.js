@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 서비스 워커 등록
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("/service-worker.js")
+      .register("./service-worker.js")
       .then((registration) => {
         console.log(
           "Service Worker registered with scope:",
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 다크 모드 스위치 이벤트 리스너
-  const darkModeSwitch = document.getElementById("darkModeSwitch");
+  const darkModeSwitch = document.getElementById("dark-mode-toggle");
   const currentTheme = localStorage.getItem("theme");
 
   if (currentTheme) {
@@ -83,27 +83,28 @@ document.addEventListener("DOMContentLoaded", () => {
       darkModeSwitch.checked = true;
     }
   }
-
-  darkModeSwitch.addEventListener("change", () => {
-    if (darkModeSwitch.checked) {
-      document.body.classList.add("dark-theme");
-      localStorage.setItem("theme", "dark-theme");
-      document.documentElement.style.setProperty("--dark-mode-filter", "1");
-    } else {
-      document.body.classList.remove("dark-theme");
-      localStorage.setItem("theme", "light-theme");
-      document.documentElement.style.setProperty("--dark-mode-filter", "0");
-    }
-    // 테마 변경 시 차트도 업데이트 (charts.js에 정의된 함수 호출)
-    if (typeof updateChartsTheme === "function") {
-      updateChartsTheme();
-    }
-  });
-
+  if (darkModeSwitch) {
+    darkModeSwitch.addEventListener("change", () => {
+      if (darkModeSwitch.checked) {
+        document.body.classList.add("dark-theme");
+        localStorage.setItem("theme", "dark-theme");
+        document.documentElement.style.setProperty("--dark-mode-filter", "1");
+      } else {
+        document.body.classList.remove("dark-theme");
+        localStorage.setItem("theme", "light-theme");
+        document.documentElement.style.setProperty("--dark-mode-filter", "0");
+      }
+      // 테마 변경 시 차트도 업데이트 (charts.js에 정의된 함수 호출)
+      if (typeof updateChartsTheme === "function") {
+        updateChartsTheme();
+      }
+    });
+  }
   // 초기 로드 시 다크 모드 스위치에 따라 Close 버튼 필터 설정
-  if (document.body.classList.contains("dark-theme")) {
+  if (darkModeSwitch && document.body.classList.contains("dark-theme")) {
     document.documentElement.style.setProperty("--dark-mode-filter", "1");
-  } else {
+  } else if (darkModeSwitch) {
+    // else if로 변경하여 darkModeSwitch가 있을 때만 실행되도록
     document.documentElement.style.setProperty("--dark-mode-filter", "0");
   }
 

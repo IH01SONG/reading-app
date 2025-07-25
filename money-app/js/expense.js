@@ -2,25 +2,26 @@
 
 let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
 let currentExpenseDate = new Date(); // Track current month for expense calendar
-let selectedCalendarDate = null; // To highlight selected date in calendar
+let selectedCalendarDate = null; // To highlight selected selected date in calendar
 
 // DOM Elements - 이들은 initExpenseTab() 내부에서 한 번만 참조됩니다.
 let expenseForm;
-let expenseDescriptionInput; // input 요소 참조를 정확히 가져오도록 변수명 변경
-let expenseAmountInput; // input 요소 참조를 정확히 가져오도록 변수명 변경
-let expenseCategorySelect; // select 요소 참조를 정확히 가져오도록 변수명 변경
-let expenseTypeSelect; // select 요소 참조를 정확히 가져오도록 변수명 변경
+let expenseDescriptionInput;
+let expenseAmountInput;
+let expenseCategorySelect;
+let expenseTypeSelect;
 
 let expenseList;
 let totalIncomeSpan;
 let totalExpenseSpan;
 let balanceSpan;
+let incomeExpenseRatioInlineSpan; // 인라인 비율 표시 span 참조 변경
 let expenseCalendarEl;
 let expenseCurrentMonthYearEl;
 let expensePrevMonthBtn;
 let expenseNextMonthBtn;
 let expenseCategorySummaryEl;
-let categorySummaryMessage;
+let categorySummaryMessage; // 고급 필터 메시지 요소
 
 // 초기화 함수
 function initExpenseTab() {
@@ -29,7 +30,6 @@ function initExpenseTab() {
     // 처음 로드될 때만 DOM 요소 참조 및 이벤트 리스너 등록
     expenseForm = document.getElementById("expense-form");
 
-    // 새로 추가된 input/select 요소 참조
     expenseDescriptionInput = document.getElementById("expense-description");
     expenseAmountInput = document.getElementById("expense-amount");
     expenseCategorySelect = document.getElementById("expense-category");
@@ -39,6 +39,9 @@ function initExpenseTab() {
     totalIncomeSpan = document.getElementById("total-income");
     totalExpenseSpan = document.getElementById("total-expense");
     balanceSpan = document.getElementById("balance");
+    incomeExpenseRatioInlineSpan = document.getElementById(
+      "income-expense-ratio-inline"
+    ); // DOM 요소 참조 ID 변경
     expenseCalendarEl = document.getElementById("expense-calendar");
     expenseCurrentMonthYearEl = document.getElementById(
       "expense-current-month-year"
@@ -57,14 +60,14 @@ function initExpenseTab() {
 
     expensePrevMonthBtn.addEventListener("click", () => {
       currentExpenseDate.setMonth(currentExpenseDate.getMonth() - 1);
-      selectedCalendarDate = null; // Reset selection on month change
-      updateAllExpenseViews(); // Re-render everything
+      selectedCalendarDate = null; // 월 변경 시 선택된 날짜 초기화
+      updateAllExpenseViews();
     });
 
     expenseNextMonthBtn.addEventListener("click", () => {
       currentExpenseDate.setMonth(currentExpenseDate.getMonth() + 1);
-      selectedCalendarDate = null; // Reset selection on month change
-      updateAllExpenseViews(); // Re-render everything
+      selectedCalendarDate = null; // 월 변경 시 선택된 날짜 초기화
+      updateAllExpenseViews();
     });
   }
 
@@ -73,11 +76,12 @@ function initExpenseTab() {
 }
 
 function updateAllExpenseViews() {
-  updateSummary();
-  renderExpenseList(selectedCalendarDate); // 선택된 날짜에 따라 내역 표시
-  updateExpenseCalendar();
-  updateExpenseCategorySummary(selectedCalendarDate);
-  // 선택된 날짜에 따라 카테고리 요약 표시
+  updateSummary(); // 요약 업데이트
+  renderExpenseList(selectedCalendarDate); // 내역 리스트 업데이트
+  updateExpenseCalendar(); // 달력 업데이트
+  updateExpenseCategorySummary(selectedCalendarDate); // 카테고리별 요약 업데이트 (강화된 부분)
+
+  // 차트 렌더링 (expense.js의 expenses 변수를 직접 전달)
   renderExpenseCharts(expenses, selectedCalendarDate);
 }
 
@@ -87,13 +91,12 @@ function updateAllExpenseViews() {
 
 function saveExpenses() {
   localStorage.setItem("expenses", JSON.stringify(expenses));
-  // 이 부분이 핵심 변경: 데이터를 저장한 후, 화면을 즉시 업데이트하도록 호출합니다.
   updateAllExpenseViews();
 }
 
 function handleExpenseFormSubmit(e) {
   e.preventDefault();
-  // DOM 요소에서 직접 value를 가져오도록 수정
+
   const description = expenseDescriptionInput.value;
   const amount = expenseAmountInput.value;
   const category = expenseCategorySelect.value;
@@ -112,17 +115,16 @@ function handleExpenseFormSubmit(e) {
     type,
     date,
     id: Date.now(),
-  }); // 고유 ID 추가
-  saveExpenses(); // 데이터 저장 (이제 이 함수 내부에서 모든 뷰 업데이트 트리거)
+  });
+  saveExpenses();
 
   expenseForm.reset();
-  expenseDescriptionInput.focus(); // 첫 번째 입력 필드로 포커스 이동
+  expenseDescriptionInput.focus();
 }
 
-// ID를 기반으로 항목 삭제
 function deleteExpense(id) {
   expenses = expenses.filter((item) => item.id !== id);
-  saveExpenses(); // 데이터 저장 및 모든 뷰 업데이트
+  saveExpenses();
 }
 
 function renderExpenseList(filterDate = null) {
@@ -138,7 +140,6 @@ function renderExpenseList(filterDate = null) {
   } else {
     const year = currentExpenseDate.getFullYear();
     const month = currentExpenseDate.getMonth();
-    // 현재 달의 내역만 필터링
     filteredExpenses = expenses.filter((item) => {
       const itemDate = new Date(item.date);
       return itemDate.getFullYear() === year && itemDate.getMonth() === month;
@@ -149,7 +150,6 @@ function renderExpenseList(filterDate = null) {
     }
   }
 
-  // 최신 내역부터 보이도록 정렬
   filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   filteredExpenses.forEach((item) => {
@@ -177,7 +177,6 @@ function renderExpenseList(filterDate = null) {
     expenseList.appendChild(li);
   });
 
-  // Delete button event listener 등록 (매번 다시 렌더링되므로, 이 위치에서 등록해야 함)
   expenseList.querySelectorAll(".delete-expense-btn").forEach((button) => {
     button.addEventListener("click", (e) => {
       const id = parseInt(e.currentTarget.dataset.id);
@@ -195,7 +194,6 @@ function updateSummary() {
   const year = currentExpenseDate.getFullYear();
   const month = currentExpenseDate.getMonth();
 
-  // 현재 월의 내역만 요약
   expenses.forEach((item) => {
     const itemDate = new Date(item.date);
     if (itemDate.getFullYear() === year && itemDate.getMonth() === month) {
@@ -211,7 +209,15 @@ function updateSummary() {
 
   totalIncomeSpan.textContent = `${totalIncome.toLocaleString()}원`;
   totalExpenseSpan.textContent = `${totalExpense.toLocaleString()}원`;
-  balanceSpan.textContent = `${balance.toLocaleString()}원`;
+  balanceSpan.textContent = `${balance.toLocaleString()}원`; // 잔액은 여전히 balanceSpan이 업데이트
+
+  // 수익 대비 지출 비율 계산 및 표시
+  let ratio = 0;
+  if (totalIncome > 0) {
+    ratio = (totalExpense / totalIncome) * 100;
+  }
+  // incomeExpenseRatioInlineSpan에 직접 업데이트
+  incomeExpenseRatioInlineSpan.textContent = `${ratio.toFixed(1)}%`;
 
   if (balance >= 0) {
     balanceSpan.className = "text-success";
@@ -293,7 +299,8 @@ function updateExpenseCalendar() {
       cell.classList.add("selected-date");
 
       renderExpenseList(selectedCalendarDate);
-      updateExpenseCategorySummary(selectedCalendarDate);
+      updateExpenseCategorySummary(selectedCalendarDate); // 날짜 선택 시 카테고리 요약도 업데이트
+      renderExpenseCharts(expenses, selectedCalendarDate); // 날짜 선택 시 차트도 업데이트
     });
 
     expenseCalendarEl.appendChild(cell);
@@ -310,19 +317,22 @@ function updateExpenseCalendar() {
 }
 
 // =========================================================================
-// 3. 카테고리별 통계 함수
+// 3. 카테고리별 통계 함수 (강화된 고급 필터)
 // =========================================================================
 
 function updateExpenseCategorySummary(filterDate = null) {
-  expenseCategorySummaryEl.innerHTML = "";
-  categorySummaryMessage.style.display = "none";
+  expenseCategorySummaryEl.innerHTML = ""; // 기존 목록 초기화
+  categorySummaryMessage.style.display = "none"; // 메시지 숨김
 
   let filteredExpensesForSummary = expenses;
 
+  // 필터링 기준 설정 (선택된 날짜 또는 현재 월)
+  let summaryPeriodText = "";
   if (filterDate) {
     filteredExpensesForSummary = expenses.filter(
       (item) => item.date === filterDate
     );
+    summaryPeriodText = `선택된 날짜 (${filterDate}) `;
   } else {
     const year = currentExpenseDate.getFullYear();
     const month = currentExpenseDate.getMonth();
@@ -330,16 +340,18 @@ function updateExpenseCategorySummary(filterDate = null) {
       const itemDate = new Date(item.date);
       return itemDate.getFullYear() === year && itemDate.getMonth() === month;
     });
+    summaryPeriodText = `현재 달 (${year}년 ${month + 1}월) `;
   }
 
+  // 데이터가 없을 경우 메시지 표시
   if (filteredExpensesForSummary.length === 0) {
-    categorySummaryMessage.textContent = filterDate
-      ? "선택된 날짜에 내역이 없습니다."
-      : "현재 달에 내역이 없습니다.";
+    categorySummaryMessage.textContent =
+      summaryPeriodText + "내역이 없어 카테고리별 통계를 표시할 수 없습니다.";
     categorySummaryMessage.style.display = "block";
     return;
   }
 
+  // 카테고리별 수입/지출 집계
   const categorySummary = {};
   filteredExpensesForSummary.forEach((item) => {
     if (!categorySummary[item.category]) {
@@ -352,32 +364,43 @@ function updateExpenseCategorySummary(filterDate = null) {
     }
   });
 
+  // 집계된 데이터를 바탕으로 목록 생성
   let hasContent = false;
   for (const category in categorySummary) {
     const summary = categorySummary[category];
-    const li = document.createElement("li");
-    li.className = "list-group-item expense-category-item";
 
-    let content = `
-            <span class="category-name">${category}</span>
-            <div>
-        `;
+    // 해당 카테고리에 수입도 지출도 없다면 건너뜀 (거의 발생하지 않음)
+    if (summary.income === 0 && summary.expense === 0) {
+      continue;
+    }
+
+    const li = document.createElement("li");
+    li.className =
+      "list-group-item expense-category-item d-flex justify-content-between align-items-center";
+
+    let categoryAmountsHtml = "";
     if (summary.income > 0) {
-      content += `<span class="category-amount text-success">+${summary.income.toLocaleString()}원</span>`;
+      categoryAmountsHtml += `<span class="category-amount text-success">+${summary.income.toLocaleString()}원</span>`;
     }
     if (summary.expense > 0) {
-      if (summary.income > 0) content += " ";
-      content += `<span class="category-amount text-danger">-${summary.expense.toLocaleString()}원</span>`;
+      // 수입도 있고 지출도 있으면 간격 추가
+      if (summary.income > 0) categoryAmountsHtml += " ";
+      categoryAmountsHtml += `<span class="category-amount text-danger">-${summary.expense.toLocaleString()}원</span>`;
     }
-    content += `</div>`;
+
+    li.innerHTML = `
+            <span class="category-name fw-bold">${category}</span>
+            <div>${categoryAmountsHtml}</div>
+        `;
     expenseCategorySummaryEl.appendChild(li);
     hasContent = true;
   }
 
+  // 모든 카테고리에 데이터가 없거나, 필터링 후 내용이 없을 때
   if (!hasContent) {
-    categorySummaryMessage.textContent = filterDate
-      ? "선택된 날짜에 카테고리별 통계가 없습니다."
-      : "현재 달에 카테고리별 통계가 없습니다.";
+    categorySummaryMessage.textContent =
+      summaryPeriodText +
+      "내역은 있으나, 카테고리별 수입/지출 통계를 표시할 항목이 없습니다.";
     categorySummaryMessage.style.display = "block";
   }
 }

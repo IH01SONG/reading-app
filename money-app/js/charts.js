@@ -56,12 +56,15 @@ function renderExpenseCharts(expensesData, filterDate = null) {
   }
 
   const categoryExpense = {};
+  let totalExpenses = 0; // 전체 지출 합계를 저장할 변수
+
   filteredExpenses.forEach((item) => {
     if (item.type === "expense") {
       if (!categoryExpense[item.category]) {
         categoryExpense[item.category] = 0;
       }
       categoryExpense[item.category] += item.amount;
+      totalExpenses += item.amount; // 전체 지출 합계에 추가
     }
   });
 
@@ -80,9 +83,10 @@ function renderExpenseCharts(expensesData, filterDate = null) {
     if (!chartMessageDiv) {
       chartMessageDiv = document.createElement("div");
       chartMessageDiv.id = "expense-chart-message";
-      chartChartCanvas.parentNode.insertBefore(
+      // expenseChartCanvas의 부모 노드에 메시지를 추가합니다.
+      expenseChartCanvas.parentNode.insertBefore(
         chartMessageDiv,
-        expenseChartCanvas.nextSibling
+        expenseChartCanvas
       );
     }
     chartMessageDiv.textContent = filterDate
@@ -107,9 +111,8 @@ function renderExpenseCharts(expensesData, filterDate = null) {
   // 현재 테마에 따라 텍스트 색상 결정
   const isDarkTheme = document.body.classList.contains("dark-theme");
   const textColor = isDarkTheme ? "#ffffff" : "#333333";
-  const gridColor = isDarkTheme
-    ? "rgba(255, 255, 255, 0.1)"
-    : "rgba(0, 0, 0, 0.1)";
+  // gridColor는 파이 차트에는 직접 사용되지 않지만, 다른 차트 유형을 위해 유지
+  // const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
 
   expenseChartInstance = new Chart(expenseChartCanvas, {
     type: "pie", // 원형 차트 사용
@@ -161,12 +164,21 @@ function renderExpenseCharts(expensesData, filterDate = null) {
               }
               return label;
             },
+            // 여기서 백분율을 추가합니다.
+            afterLabel: function (context) {
+              // 전체 지출 합계가 0이 아니면 백분율 계산
+              if (totalExpenses > 0) {
+                const percentage = (
+                  (context.parsed / totalExpenses) *
+                  100
+                ).toFixed(1); // 소수점 첫째 자리까지
+                return `(${percentage}%)`;
+              }
+              return "";
+            },
           },
         },
       },
     },
   });
 }
-
-// 가계부 고급 필터(카테고리별 통계) 섹션 아래에 차트를 추가할 HTML 요소를 추가해야 합니다.
-// index.html의 해당 위치에 <canvas id="expenseCategoryChart"></canvas>를 추가해주세요.
