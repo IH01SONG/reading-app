@@ -2,35 +2,81 @@
 
 /* --- CSS 변수 정의 (기본값 설정) --- */
 :root {
-  --primary-color: #0d6efd; /* Bootstrap primary */
-  --secondary-color: #6c757d; /* Bootstrap secondary */
-  --success-color: #198754; /* Bootstrap success */
-  --info-color: #0dcaf0; /* Bootstrap info */
-  --danger-color: #dc3545; /* Bootstrap danger */
-  --warning-color: #ffc107; /* Bootstrap warning */
-
-  --background-color: #f8f9fa; /* Light background */
-  --card-background-color: #ffffff; /* White card background */
-  --text-color: #212529; /* Dark text */
-  --muted-text-color: #6c757d; /* Muted text */
-  --border-color: #dee2e6; /* Light border */
+  --primary-color: #0d6efd;
+  --secondary-color: #6c757d;
+  --success-color: #198754;
+  --info-color: #0dcaf0;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --background-color: #f8f9fa;
+  --card-background-color: #ffffff;
+  --text-color: #212529;
+  --muted-text-color: #6c757d;
+  --border-color: #dee2e6;
+  --header-bg-color: rgba(255, 255, 255, 0.95);
 }
 
 body {
   background-color: var(--background-color);
   color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* --- 상단 내비게이션 바 --- */
+.main-header {
+  background-color: var(--header-bg-color);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.navbar-brand {
+  color: var(--primary-color) !important;
+}
+
+.nav-link {
+  color: var(--text-color);
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--primary-color) !important;
+  font-weight: 700;
+}
+
+/* --- 화면 전환 (View) 스타일 --- */
+.view {
+  display: none; /* 기본적으로 모든 섹션 숨김 */
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.view.active {
+  display: block; /* 활성화된 섹션만 보임 */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- 카드 및 공통 컴포넌트 스타일 --- */
 .card {
   background-color: var(--card-background-color);
-  border-color: var(--border-color);
+  border: none;
+  border-radius: 0.75rem;
 }
 
 .card-title {
   font-weight: bold;
-  color: var(
-    --primary-color
-  ) !important; /* Bootstrap 클래스보다 우선하도록 !important 사용 */
+  color: var(--primary-color) !important;
 }
 
 .form-label,
@@ -60,17 +106,16 @@ strong {
   border-color: var(--primary-color);
 }
 .btn-primary:hover {
-  background-color: var(
-    --primary-color
-  ); /* 호버 시 약간 어둡게 또는 Lighten/Darken 함수 사용 가능 */
+  background-color: var(--primary-color);
   border-color: var(--primary-color);
-  filter: brightness(85%); /* 임시적으로 약간 어둡게 */
+  filter: brightness(90%);
 }
 .btn-outline-primary {
   color: var(--primary-color);
   border-color: var(--primary-color);
 }
-.btn-outline-primary:hover {
+.btn-outline-primary:hover,
+.btn-outline-primary.active {
   background-color: var(--primary-color);
   color: var(--card-background-color);
 }
@@ -82,7 +127,7 @@ strong {
 .btn-success:hover {
   background-color: var(--success-color);
   border-color: var(--success-color);
-  filter: brightness(85%);
+  filter: brightness(90%);
 }
 .btn-outline-success {
   color: var(--success-color);
@@ -99,7 +144,6 @@ strong {
 }
 .btn-outline-info:hover,
 .btn-outline-info.active {
-  /* active 상태도 변경 */
   background-color: var(--info-color);
   color: var(--card-background-color);
 }
@@ -123,22 +167,62 @@ strong {
   color: var(--card-background-color);
 }
 
-/* 폼 컨트롤 배경 및 테두리 */
+/* 폼 컨트롤 */
 .form-control,
 .form-select {
   background-color: var(--card-background-color);
   color: var(--text-color);
   border-color: var(--border-color);
 }
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
+}
 .form-control::placeholder {
   color: var(--muted-text-color);
 }
 
-/* 기타 */
+/* 목록 아이템 */
 .list-group-item {
   background-color: var(--card-background-color);
   border-color: var(--border-color);
+  border-radius: 0.5rem !important;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
-.list-group-item.list-group-item-action:hover {
-  background-color: var(--background-color); /* 호버 시 배경색으로 변경 */
+.list-group-item:hover {
+  background-color: var(--background-color);
+  transform: translateY(-2px);
+}
+.book-item-actions {
+  min-width: 210px; /* 버튼들이 줄바꿈되지 않도록 최소 너비 지정 */
+}
+
+/* 광고 영역 */
+.kakao_ad_area {
+  margin: 20px auto;
+}
+
+/* --- 나의 구절 기록장 스타일 --- */
+.memo-card {
+  background-color: var(--card-background-color);
+  border-left: 5px solid var(--secondary-color);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+.memo-card blockquote {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+.memo-card footer {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  text-align: right;
+}
+.memo-card-actions {
+  text-align: right;
+  margin-top: 0.5rem;
 }

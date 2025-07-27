@@ -10,8 +10,11 @@
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    />
     <link rel="stylesheet" href="styles.css" />
-    <!-- Google tag (gtag.js) -->
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-HTB4W0C5NL"
@@ -22,115 +25,131 @@
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-
       gtag("config", "G-HTB4W0C5NL");
     </script>
   </head>
   <body>
-    <div class="container mt-5" id="mainApp">
-      <h1 class="text-center mb-4">나의 독서 목록 & 감상평</h1>
-      <div class="text-center mb-4">
-        <ins
-          class="kakao_ad_area"
-          style="display: none"
-          data-ad-unit="DAN-vAk0mimVrqz5Jbbn"
-          data-ad-width="320"
-          data-ad-height="50"
-        ></ins>
-        <script
-          type="text/javascript"
-          src="//t1.daumcdn.net/kas/static/ba.min.js"
-          async
-        ></script>
-      </div>
-      <div class="row mb-3 align-items-center">
-        <div class="col-md-4 offset-md-8 text-end">
-          <label for="themeSelector" class="form-label mb-0 me-2"
-            >테마 선택:</label
-          >
-          <select
-            class="form-select d-inline-block w-auto"
-            id="themeSelector"
-            onchange="applyTheme(this.value)"
-          ></select>
+    <header class="main-header sticky-top">
+      <nav class="container navbar navbar-expand-lg">
+        <a class="navbar-brand fw-bold" href="#add-book-view"
+          >📚 나의 독서 목록</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="#add-book-view">책 추가</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#list-view">목록 보기</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#goal-view">독서 목표</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#memo-view">나의 구절</a>
+            </li>
+          </ul>
+          <div class="d-flex align-items-center">
+            <label for="themeSelector" class="form-label mb-0 me-2 text-nowrap"
+              >테마:</label
+            >
+            <select
+              class="form-select form-select-sm"
+              id="themeSelector"
+              onchange="applyTheme(this.value)"
+            ></select>
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-md-8">
-          <div class="card p-4 mb-4 shadow-sm">
-            <h2 class="card-title text-primary mb-3">새 책 추가</h2>
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="bookTitle" class="form-label">도서 제목</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="bookTitle"
-                  placeholder="예: 어린 왕자"
-                />
-              </div>
-              <div class="col-md-6">
-                <label for="bookAuthor" class="form-label">저자</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="bookAuthor"
-                  placeholder="예: 앙투안 드 생텍쥐페리"
-                />
-              </div>
-              <div class="col-md-6">
-                <label for="bookGenre" class="form-label">장르</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="bookGenre"
-                  placeholder="예: 소설, 에세이"
-                />
-              </div>
-              <div class="col-md-6">
-                <label for="bookStatus" class="form-label">독서 상태</label>
-                <select class="form-select" id="bookStatus">
-                  <option value="wish">읽고 싶은 책</option>
-                  <option value="reading">읽는 중</option>
-                  <option value="completed">완독</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label for="completionStatus" class="form-label"
-                  >완결 여부</label
-                >
-                <select class="form-select" id="completionStatus">
-                  <option value="">선택 안 함</option>
-                  <option value="completed">완결작</option>
-                  <option value="serialized">연재작</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label for="totalChapters" class="form-label">총 회차/권</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  id="totalChapters"
-                  min="0"
-                  placeholder="예: 10"
-                />
-              </div>
-              <div class="col-md-3">
-                <label for="readChapters" class="form-label"
-                  >읽은 회차/권</label
-                >
-                <input
-                  type="number"
-                  class="form-control"
-                  id="readChapters"
-                  min="0"
-                  placeholder="예: 3"
-                />
-              </div>
-              <div class="col-md-6 d-flex align-items-end">
-                <div class="me-3 flex-grow-1">
-                  <label for="bookRating" class="form-label">별점</label>
-                  <select class="form-select form-select-sm" id="bookRating">
+      </nav>
+    </header>
+
+    <main class="container mt-4">
+      <section id="add-book-view" class="view active">
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="card p-4 mb-4 shadow-sm">
+              <h2 class="card-title mb-3">새 책 추가</h2>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="bookTitle" class="form-label">도서 제목</label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="bookTitle"
+                    placeholder="예: 어린 왕자"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="bookAuthor" class="form-label">저자</label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="bookAuthor"
+                    placeholder="예: 앙투안 드 생텍쥐페리"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="bookGenre" class="form-label">장르</label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="bookGenre"
+                    placeholder="예: 소설, 에세이"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="bookStatus" class="form-label">독서 상태</label
+                  ><select class="form-select" id="bookStatus">
+                    <option value="wish">읽고 싶은 책</option>
+                    <option value="reading">읽는 중</option>
+                    <option value="completed">완독</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="completionStatus" class="form-label"
+                    >완결 여부</label
+                  ><select class="form-select" id="completionStatus">
+                    <option value="">선택 안 함</option>
+                    <option value="completed">완결작</option>
+                    <option value="serialized">연재작</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="totalChapters" class="form-label"
+                    >총 회차/권</label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="totalChapters"
+                    min="0"
+                    placeholder="예: 10"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <label for="readChapters" class="form-label"
+                    >읽은 회차/권</label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="readChapters"
+                    min="0"
+                    placeholder="예: 3"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="bookRating" class="form-label">별점</label
+                  ><select class="form-select" id="bookRating">
                     <option value="">별점 선택</option>
                     <option value="1">⭐</option>
                     <option value="2">⭐⭐</option>
@@ -139,97 +158,52 @@
                     <option value="5">⭐⭐⭐⭐⭐</option>
                   </select>
                 </div>
-                <div class="flex-grow-1">
-                  <label class="form-label">필터</label>
-                  <div id="filterButtons" class="d-flex flex-wrap gap-2">
-                    <button
-                      class="btn btn-sm btn-outline-secondary active"
-                      onclick="applyFilter(null, null)"
-                    >
-                      전체
-                    </button>
-                  </div>
+                <div class="col-md-12">
+                  <label for="bookReview" class="form-label">감상평</label
+                  ><textarea
+                    class="form-control"
+                    id="bookReview"
+                    rows="4"
+                    placeholder="감상평을 작성해주세요..."
+                  ></textarea>
                 </div>
-              </div>
-              <div class="col-md-12">
-                <label for="bookReview" class="form-label">감상평</label>
-                <textarea
-                  class="form-control"
-                  id="bookReview"
-                  rows="4"
-                  placeholder="감상평을 작성해주세요..."
-                ></textarea>
-              </div>
-              <div class="col-12 text-end">
-                <button class="btn btn-primary" onclick="addBook()">
-                  책 추가
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="card p-4 mb-4 shadow-sm">
-            <h2 class="card-title text-primary mb-3">독서 목표 설정</h2>
-            <div class="row g-3 align-items-end">
-              <div class="col-md-6">
-                <label for="annualGoal" class="form-label"
-                  >올해 목표 (권)</label
-                >
-                <input
-                  type="number"
-                  class="form-control"
-                  id="annualGoal"
-                  min="0"
-                  placeholder="예: 20"
-                />
-              </div>
-              <div class="col-md-6">
-                <button
-                  class="btn btn-primary w-100"
-                  onclick="setReadingGoal()"
-                >
-                  목표 설정
-                </button>
-              </div>
-            </div>
-            <div class="mt-3">
-              <p class="mb-1">
-                현재 목표: <strong id="currentAnnualGoal">0권</strong>
-              </p>
-              <p class="mb-1">
-                올해 완독: <strong id="completedThisYear">0권</strong>
-              </p>
-              <div class="progress" style="height: 25px">
-                <div
-                  id="goalProgressBar"
-                  class="progress-bar"
-                  role="progressbar"
-                  style="width: 0%"
-                  aria-valuenow="0"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  0%
+                <div class="col-12 text-end">
+                  <button class="btn btn-primary" id="addOrUpdateBookBtn">
+                    책 추가
+                  </button>
                 </div>
               </div>
             </div>
           </div>
+          <div class="col-lg-4">
+            <div class="card p-4 mb-4 shadow-sm">
+              <h2 class="card-title mb-3">장르별 별점 순위</h2>
+              <div id="genreRankingList" class="list-group">
+                <p class="text-muted text-center" id="noRankingMessage">
+                  별점이 등록된 책이 없습니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-          <div class="card p-4 mb-4 shadow-sm">
-            <h2 class="card-title text-primary mb-3">내 독서 목록</h2>
-            <div class="mb-3 d-flex align-items-center">
+      <section id="list-view" class="view">
+        <div class="card p-4 mb-4 shadow-sm">
+          <h2 class="card-title mb-3">내 독서 목록</h2>
+          <div class="row g-3 mb-3 align-items-center">
+            <div class="col-lg-6">
               <input
                 type="text"
-                class="form-control me-2"
+                class="form-control"
                 id="searchBook"
                 placeholder="제목 또는 저자로 검색..."
                 onkeyup="applyFilter()"
               />
-              <label for="sortOrder" class="form-label mb-0 me-2 text-nowrap"
-                >정렬:</label
-              >
+            </div>
+            <div class="col-lg-3">
               <select
-                class="form-select w-auto"
+                class="form-select"
                 id="sortOrder"
                 onchange="applyFilter()"
               >
@@ -243,113 +217,111 @@
                 <option value="rating_asc">별점 (낮은순)</option>
               </select>
             </div>
-            <div id="bookList" class="list-group"></div>
-            <div class="mt-3 text-center">
-              <button class="btn btn-outline-success" onclick="generateStats()">
-                독서 통계 보기
+            <div class="col-lg-3" id="filterButtonsContainer">
+              <div id="filterButtons" class="d-flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+          <div id="bookList" class="list-group"></div>
+        </div>
+      </section>
+
+      <section id="goal-view" class="view">
+        <div class="card p-4 mb-4 shadow-sm">
+          <h2 class="card-title mb-3">독서 목표 설정</h2>
+          <div class="row g-3 align-items-end">
+            <div class="col-md-6">
+              <label for="annualGoal" class="form-label">올해 목표 (권)</label
+              ><input
+                type="number"
+                class="form-control"
+                id="annualGoal"
+                min="0"
+                placeholder="예: 20"
+              />
+            </div>
+            <div class="col-md-6">
+              <button class="btn btn-primary w-100" onclick="setReadingGoal()">
+                목표 설정
               </button>
             </div>
           </div>
-          <ins
-            class="kakao_ad_area"
-            style="display: none"
-            data-ad-unit="DAN-vAk0mimVrqz5Jbbn"
-            data-ad-width="320"
-            data-ad-height="50"
-          ></ins>
-          <script
-            type="text/javascript"
-            src="//t1.daumcdn.net/kas/static/ba.min.js"
-            async
-          ></script>
-          <div class="card p-4 mb-4 shadow-sm">
-            <h2 class="card-title text-primary mb-3">독서 데이터 시각화</h2>
-            <ul class="nav nav-tabs mb-3" id="chartTabs" role="tablist">
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link active"
-                  id="genre-chart-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#genreChartPane"
-                  type="button"
-                  role="tab"
-                  aria-controls="genreChartPane"
-                  aria-selected="true"
-                >
-                  장르별
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link"
-                  id="status-chart-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#statusChartPane"
-                  type="button"
-                  role="tab"
-                  aria-controls="statusChartPane"
-                  aria-selected="false"
-                >
-                  상태별
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link"
-                  id="monthly-chart-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#monthlyChartPane"
-                  type="button"
-                  role="tab"
-                  aria-controls="monthlyChartPane"
-                  aria-selected="false"
-                >
-                  월별 완독
-                </button>
-              </li>
-            </ul>
-            <div class="tab-content" id="chartTabContent">
+          <div class="mt-4">
+            <p class="mb-1 fs-5">
+              올해 완독: <strong id="completedThisYear">0권</strong> /
+              <strong id="currentAnnualGoal">0권</strong>
+            </p>
+            <div class="progress" style="height: 25px">
               <div
-                class="tab-pane fade show active"
-                id="genreChartPane"
-                role="tabpanel"
-                aria-labelledby="genre-chart-tab"
+                id="goalProgressBar"
+                class="progress-bar"
+                role="progressbar"
+                style="width: 0%"
+                aria-valuenow="0"
+                aria-valuemin="0"
+                aria-valuemax="100"
               >
-                <canvas id="genreChart"></canvas>
-              </div>
-              <div
-                class="tab-pane fade"
-                id="statusChartPane"
-                role="tabpanel"
-                aria-labelledby="status-chart-tab"
-              >
-                <canvas id="statusChart"></canvas>
-              </div>
-              <div
-                class="tab-pane fade"
-                id="monthlyChartPane"
-                role="tabpanel"
-                aria-labelledby="monthly-chart-tab"
-              >
-                <canvas id="monthlyChart"></canvas>
+                0%
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div class="card p-4 shadow-sm" id="results"></div>
-        </div>
-        <div class="col-md-4">
-          <div class="card p-4 mb-4 shadow-sm">
-            <h2 class="card-title text-primary mb-3">장르별 별점 순위</h2>
-            <div id="genreRankingList" class="list-group">
-              <p class="text-muted text-center" id="noRankingMessage">
-                별점이 등록된 책이 없습니다.
-              </p>
+      <section id="memo-view" class="view">
+        <div class="card p-4 mb-4 shadow-sm">
+          <h2 class="card-title mb-3">나의 구절 기록장 📝</h2>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="memoBookSelect" class="form-label">책 선택</label>
+              <select id="memoBookSelect" class="form-select"></select>
+            </div>
+            <div class="col-md-2">
+              <label for="memoPage" class="form-label">페이지</label>
+              <input
+                type="text"
+                id="memoPage"
+                class="form-control"
+                placeholder="p.52"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="memoContent" class="form-label"
+                >인상 깊은 구절 또는 메모</label
+              >
+              <textarea
+                id="memoContent"
+                class="form-control"
+                rows="3"
+                placeholder="기억하고 싶은 구절을 입력하세요..."
+              ></textarea>
+            </div>
+            <div class="col-12 text-end">
+              <button class="btn btn-success" onclick="addMemo()">
+                구절 추가
+              </button>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+        <div id="memoList" class="mt-4"></div>
+      </section>
+    </main>
+
+    <footer class="container text-center py-4 mt-auto">
+      <p class="text-muted">&copy; 2024 나의 독서 목록. All Rights Reserved.</p>
+      <ins
+        class="kakao_ad_area"
+        style="display: none"
+        data-ad-unit="DAN-vAk0mimVrqz5Jbbn"
+        data-ad-width="728"
+        data-ad-height="90"
+      ></ins>
+      <script
+        type="text/javascript"
+        src="//t1.daumcdn.net/kas/static/ba.min.js"
+        async
+      ></script>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
