@@ -2,16 +2,8 @@
 
 // PWA 관련 변수
 let deferredPrompt;
-const installAppButton = document.getElementById("install-app-button");
-let installGuideModalInstance; // Bootstrap 모달 인스턴스를 저장할 변수
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Bootstrap 모달 인스턴스를 DOMContentLoaded 이후에 생성
-  const installGuideModalElement = document.getElementById("installGuideModal");
-  if (installGuideModalElement) {
-    installGuideModalInstance = new bootstrap.Modal(installGuideModalElement);
-  }
-
   // 서비스 워커 등록
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
@@ -27,7 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // PWA 설치 프롬프트 이벤트 리스너
+  // PWA 설치 프롬프트 표시 제어 (버튼이 있을 때만 노출)
+  const installAppButton = document.getElementById("install-app-button");
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredPrompt = e;
@@ -35,92 +28,86 @@ document.addEventListener("DOMContentLoaded", () => {
       installAppButton.style.display = "block";
     }
   });
-
-  // '앱 설치하기' 버튼 클릭 이벤트
   if (installAppButton) {
-    installAppButton.addEventListener("click", () => {
-      if (installGuideModalInstance) {
-        installGuideModalInstance.show();
-      }
-    });
-  }
-
-  // 앱이 설치되었을 때 '앱 설치하기' 버튼 숨기기
-  window.addEventListener("appinstalled", () => {
-    if (installAppButton) {
+    installAppButton.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
       installAppButton.style.display = "none";
-    }
-    if (installGuideModalInstance) {
-      installGuideModalInstance.hide();
-    }
-  });
-
-  // 탭 전환 이벤트 리스너
-  const myTabEl = document.querySelector("#myTab");
-  if (myTabEl) {
-    myTabEl.addEventListener("shown.bs.tab", (event) => {
-      // 각 탭으로 이동 시 해당 기능의 초기화/업데이트 함수 호출
-      if (event.target.id === "expense-tab") {
-        if (typeof initExpenseTab === "function") {
-          initExpenseTab();
-        }
-      } else if (event.target.id === "todo-tab") {
-        if (typeof initTodoTab === "function") {
-          initTodoTab();
-        }
-      }
-      // 습관 추적기 관련 로직 제거됨
     });
   }
 
-  // 다크 모드 스위치 이벤트 리스너
-  const darkModeSwitch = document.getElementById("dark-mode-toggle");
-  const currentTheme = localStorage.getItem("theme");
+  // 탭 전환: 네비게이션 a[data-tab]과 컨텐츠 #id 연동
+  const navLinks = document.querySelectorAll("a[data-tab]");
+  const tabContents = document.querySelectorAll(".tab-content");
+  navLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const target = link.getAttribute("data-tab");
 
-  if (currentTheme) {
-    document.body.classList.add(currentTheme);
-    if (currentTheme === "dark-theme") {
-      darkModeSwitch.checked = true;
-    }
-  }
-  if (darkModeSwitch) {
-    darkModeSwitch.addEventListener("change", () => {
-      if (darkModeSwitch.checked) {
-        document.body.classList.add("dark-theme");
-        localStorage.setItem("theme", "dark-theme");
-        document.documentElement.style.setProperty("--dark-mode-filter", "1");
-      } else {
-        document.body.classList.remove("dark-theme");
-        localStorage.setItem("theme", "light-theme");
-        document.documentElement.style.setProperty("--dark-mode-filter", "0");
-      }
-      // 테마 변경 시 차트도 업데이트 (charts.js에 정의된 함수 호출)
-      if (typeof updateChartsTheme === "function") {
-        updateChartsTheme();
-      }
-    });
-  }
-  // 초기 로드 시 다크 모드 스위치에 따라 Close 버튼 필터 설정
-  if (darkModeSwitch && document.body.classList.contains("dark-theme")) {
-    document.documentElement.style.setProperty("--dark-mode-filter", "1");
-  } else if (darkModeSwitch) {
-    // else if로 변경하여 darkModeSwitch가 있을 때만 실행되도록
-    document.documentElement.style.setProperty("--dark-mode-filter", "0");
-  }
+      // nav active 토글
+      navLinks.forEach((l) => l.classList.remove("active"));
+      link.classList.add("active");
 
-  // 페이지 초기 로드 시 활성화된 탭의 내용 초기화
-  const activeTabButton = document.querySelector("#myTab .nav-link.active");
-  if (activeTabButton) {
-    const activeTabId = activeTabButton.id;
-    if (activeTabId === "expense-tab") {
-      if (typeof initExpenseTab === "function") {
+      // 콘텐츠 토글
+      tabContents.forEach((c) => c.classList.remove("active"));
+      const targetEl = document.getElementById(target);
+      if (targetEl) targetEl.classList.add("active");
+
+      // 탭별 초기화
+      if (target === "expense" && typeof initExpenseTab === "function") {
         initExpenseTab();
       }
-    } else if (activeTabId === "todo-tab") {
-      if (typeof initTodoTab === "function") {
+      if (target === "todo" && typeof initTodoTab === "function") {
         initTodoTab();
       }
+    });
+  });
+
+  // 다크 모드: 스위치와 상단 버튼 동기화
+  const darkModeSwitch = document.getElementById("dark-mode-toggle");
+  const themeToggleButton = document.getElementById("theme-toggle");
+  const setTheme = (theme) => {
+    const isDark = theme === "dark-theme";
+    document.body.classList.toggle("dark-theme", isDark);
+    localStorage.setItem("theme", isDark ? "dark-theme" : "light-theme");
+    document.documentElement.style.setProperty(
+      "--dark-mode-filter",
+      isDark ? "1" : "0"
+    );
+    if (darkModeSwitch) darkModeSwitch.checked = isDark;
+    if (themeToggleButton) {
+      const icon = themeToggleButton.querySelector("i");
+      if (icon) {
+        icon.classList.toggle("bi-moon-fill", !isDark);
+        icon.classList.toggle("bi-sun-fill", isDark);
+      }
     }
-    // 습관 추적기 관련 로직 제거됨
+    if (typeof updateChartsTheme === "function") {
+      updateChartsTheme();
+    }
+  };
+
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme) setTheme(savedTheme);
+
+  if (darkModeSwitch) {
+    darkModeSwitch.addEventListener("change", () => {
+      setTheme(darkModeSwitch.checked ? "dark-theme" : "light-theme");
+    });
+  }
+  if (themeToggleButton) {
+    themeToggleButton.addEventListener("click", () => {
+      const isDark = document.body.classList.contains("dark-theme");
+      setTheme(isDark ? "light-theme" : "dark-theme");
+    });
+  }
+
+  // 초기 활성 탭 컨텐츠 초기화
+  if (document.getElementById("expense")?.classList.contains("active")) {
+    if (typeof initExpenseTab === "function") initExpenseTab();
+  } else if (document.getElementById("todo")?.classList.contains("active")) {
+    if (typeof initTodoTab === "function") initTodoTab();
   }
 });

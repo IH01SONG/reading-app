@@ -15,20 +15,37 @@ function updateChartsTheme() {
 
   // 기존 차트가 있다면 업데이트
   if (expenseChartInstance) {
-    expenseChartInstance.options.scales.x.ticks.color = textColor;
-    expenseChartInstance.options.scales.y.ticks.color = textColor;
-    expenseChartInstance.options.scales.x.grid.color = gridColor;
-    expenseChartInstance.options.scales.y.grid.color = gridColor;
-    expenseChartInstance.options.plugins.legend.labels.color = textColor;
+    // 파이 차트에는 scales가 없을 수 있으므로 안전 체크
+    if (expenseChartInstance.options.scales) {
+      if (expenseChartInstance.options.scales.x) {
+        expenseChartInstance.options.scales.x.ticks.color = textColor;
+        expenseChartInstance.options.scales.x.grid.color = gridColor;
+      }
+      if (expenseChartInstance.options.scales.y) {
+        expenseChartInstance.options.scales.y.ticks.color = textColor;
+        expenseChartInstance.options.scales.y.grid.color = gridColor;
+      }
+    }
+    if (expenseChartInstance.options.plugins?.legend?.labels) {
+      expenseChartInstance.options.plugins.legend.labels.color = textColor;
+    }
     expenseChartInstance.update();
   }
   if (incomeChartInstance) {
     // 수입 차트도 있다면
-    incomeChartInstance.options.scales.x.ticks.color = textColor;
-    incomeChartInstance.options.scales.y.ticks.color = textColor;
-    incomeChartInstance.options.scales.x.grid.color = gridColor;
-    incomeChartInstance.options.scales.y.grid.color = gridColor;
-    incomeChartInstance.options.plugins.legend.labels.color = textColor;
+    if (incomeChartInstance.options.scales) {
+      if (incomeChartInstance.options.scales.x) {
+        incomeChartInstance.options.scales.x.ticks.color = textColor;
+        incomeChartInstance.options.scales.x.grid.color = gridColor;
+      }
+      if (incomeChartInstance.options.scales.y) {
+        incomeChartInstance.options.scales.y.ticks.color = textColor;
+        incomeChartInstance.options.scales.y.grid.color = gridColor;
+      }
+    }
+    if (incomeChartInstance.options.plugins?.legend?.labels) {
+      incomeChartInstance.options.plugins.legend.labels.color = textColor;
+    }
     incomeChartInstance.update();
   }
 }

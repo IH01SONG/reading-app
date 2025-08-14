@@ -7,7 +7,9 @@
   --secondary-color: #a29bfe; /* 밝은 보라색 */
   --success-color: #00b894; /* 초록색 */
   --danger-color: #d63031; /* 빨간색 */
+  --danger-color-rgb: 214, 48, 49;
   --warning-color: #fdcb6e; /* 노란색 */
+  --warning-color-rgb: 253, 203, 110;
   --info-color: #0984e3; /* 파란색 */
 
   --background-color: #f8f9fa; /* 전체 배경 */
@@ -329,6 +331,33 @@ canvas {
 #no-monthly-chart-data,
 #no-overall-chart-data {
   color: var(--muted-text-color) !important;
+}
+/* 탭 콘텐츠 표시 제어 */
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+
+/* Expense 달력 컨테이너 (index.html 구조에 맞춤) */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.calendar-grid .day-header {
+  text-align: center;
+  font-weight: 600;
+  color: var(--muted-text-color);
+}
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.day-cell.empty {
+  opacity: 0.4;
 }
 /* expense calendar specific styles */
 .expense-day-cell {
