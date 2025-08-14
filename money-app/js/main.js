@@ -110,4 +110,8 @@ document.addEventListener("DOMContentLoaded", () => {
   } else if (document.getElementById("todo")?.classList.contains("active")) {
     if (typeof initTodoTab === "function") initTodoTab();
   }
+
+  // 안전장치: 두 탭 모두 한 번 초기화하여 폼 이벤트가 항상 준비되도록 함
+  if (typeof initExpenseTab === "function") initExpenseTab();
+  if (typeof initTodoTab === "function") initTodoTab();
 });

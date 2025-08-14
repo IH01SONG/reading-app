@@ -39,7 +39,7 @@ body.dark-theme {
   --background-color: #121212; /* 어두운 배경 */
   --card-background-color: #1e1e1e; /* 어두운 카드 배경 */
   --text-color: #bfeb60; /* **텍스트 색상을 새로운 네온 그린으로 변경** */
-  --muted-text-color: #a0a0a0; /* 밝은 회색 텍스트 */
+  --muted-text-color: #d0d0d0; /* 더 밝은 회색 텍스트 */
   --border-color: #333333; /* 어두운 경계선 */
   --input-bg-color: #2d2d2d; /* 입력 필드 배경 */
   --input-text-color: #bfeb60; /* 입력 필드 텍스트도 네온 그린으로 */
@@ -332,6 +332,10 @@ canvas {
 #no-overall-chart-data {
   color: var(--muted-text-color) !important;
 }
+/* 다크모드에서 muted 텍스트 가독성 향상 */
+body.dark-theme .text-muted {
+  color: var(--muted-text-color) !important;
+}
 /* 탭 콘텐츠 표시 제어 */
 .tab-content {
   display: none;
@@ -355,6 +359,7 @@ canvas {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 6px;
+  grid-column: 1 / -1; /* 헤더 7칸 아래 전체 폭 사용 */
 }
 .day-cell.empty {
   opacity: 0.4;
